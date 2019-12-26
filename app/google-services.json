@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "576141085480",
+    "firebase_url": "https://teddystagram.firebaseio.com",
+    "project_id": "teddystagram",
+    "storage_bucket": "teddystagram.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:576141085480:android:72e1bf9a19d47699075e1d",
+        "android_client_info": {
+          "package_name": "com.example.teddystagram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "576141085480-s9lhudonb3f6dd1e2j4bc0lmam661i4b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.teddystagram",
+            "certificate_hash": "24d672c2253cd589180ab893c5a68f9221000cc3"
+          }
+        },
+        {
+          "client_id": "576141085480-qldg42gc2gjbll6m6ertq5nf9nhe06er.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.teddystagram",
+            "certificate_hash": "5f0b0d1641ec16e031a69ca4f8fd104893e430a7"
+          }
+        },
+        {
+          "client_id": "576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU-jpH6XrqxVgJkECelIwXJ7KDTwH2MaM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
