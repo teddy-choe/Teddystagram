@@ -55,6 +55,11 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        moveMainPage(auth?.currentUser)
+    }
+
     /*
      * 이메일 주소를 통해 회원가입을 합니다.
      */
