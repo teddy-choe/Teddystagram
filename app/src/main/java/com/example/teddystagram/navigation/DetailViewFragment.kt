@@ -79,9 +79,9 @@ class DetailViewFragment : Fragment() {
             Glide.with(p0.itemView.context).load(contentDTOs!![p1].imageUrl).into(viewholder.detailviewitem_profile_image)
 
             //This code is when the button is clicked
-            viewholder.detailviewitem_favorite_imageview.setOnClickListener {
+            /*viewholder.detailviewitem_favorite_imageview.setOnClickListener {
                 favoriteEvent(p1)
-            }
+            }*/
 
             if(contentDTOs!![p1].favorites.containsKey(uid)){
                 //This is like status
@@ -101,6 +101,7 @@ class DetailViewFragment : Fragment() {
                 activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_content,fragment)?.commit()
             }
         }
+        /*
         fun favoriteEvent(position : Int) {
             var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
             firestore?.runTransaction { transaction ->
@@ -117,6 +118,6 @@ class DetailViewFragment : Fragment() {
                 }
                 transaction.set(tsDoc,contentDTO)
             }
-        }
+        }*/
         }
     }
