@@ -9,6 +9,7 @@
     <!--Toolbar-->
 
     <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="35dp">
         <RelativeLayout
@@ -40,6 +41,8 @@
     </androidx.appcompat.widget.Toolbar>
 
     <FrameLayout
+        android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/bottom_navigation"
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
