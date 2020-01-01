@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.teddystagram.FcmPush
 import com.example.teddystagram.R
 import com.example.teddystagram.navigation.model.AlarmDTO
 import com.example.teddystagram.navigation.model.ContentDTO
@@ -20,11 +21,13 @@ import kotlinx.android.synthetic.main.item_detail.view.*
 class DetailViewFragment : Fragment() {
     var firestore : FirebaseFirestore? = null
     var uid : String? = null
+    var fcmPush : FcmPush? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail,container,false)
         firestore = FirebaseFirestore.getInstance()
         uid = FirebaseAuth.getInstance().currentUser?.uid
+        fcmPush = FcmPush()
 
         view.detailviewfragment_recyclerview.adapter = DetailViewRecyclerViewAdapter()
         view.detailviewfragment_recyclerview.layoutManager = LinearLayoutManager(activity)
@@ -76,9 +79,6 @@ class DetailViewFragment : Fragment() {
 
             //likes
             viewholder.detailviewitem_favoritecounter_textview.text = "Likes" + contentDTOs!![p1].favoriteCount
-
-            //ProfileImage
-            //Glide.with(p0.itemView.context).load(contentDTOs!![p1].imageUrl).into(viewholder.detailviewitem_profile_image)
 
             //This code is when the button is clicked
             viewholder.detailviewitem_favorite_imageview.setOnClickListener {
@@ -138,8 +138,9 @@ class DetailViewFragment : Fragment() {
             alarmDTO.timestamp = System.currentTimeMillis()
 
             FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
-            //var message = user?.currentUser?.email + getString(R.string.alarm_favorite)
-            //fcmPush?.sendMessage(destinationUid,"알림 메세지 입니다.",message)
+
+            var message = FirebaseAuth.getInstance()?.currentUser?.email + getString(R.string.alarm_favorite)
+            fcmPush?.sendMessage(destinationUid,"알림 메세지 입니다.",message)
         }
         }
     }

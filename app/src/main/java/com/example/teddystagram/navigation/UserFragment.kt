@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.example.teddystagram.FcmPush
 import com.example.teddystagram.LoginActivity
 import com.example.teddystagram.MainActivity
 import com.example.teddystagram.R
@@ -31,6 +32,7 @@ class UserFragment : Fragment() {
     var uid: String? = null
     var auth: FirebaseAuth? = null
     var currentUserUid : String? = null
+    var fcmPush : FcmPush? = null
 
     companion object{
         var PICK_PROFILE_FROM_ALBUM = 10
@@ -42,6 +44,7 @@ class UserFragment : Fragment() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
+        fcmPush = FcmPush()
 
         if (uid == currentUserUid) {
             //나의 유저페이지
@@ -112,8 +115,9 @@ class UserFragment : Fragment() {
         alarmDTO.timestamp = System.currentTimeMillis()
 
         FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
-        //var message = auth?.currentUser?.email + getString(R.string.alarm_follow)
-        //fcmPush?.sendMessage(destinationUid!!, "알림 메세지 입니다.", message)
+
+        var message = auth?.currentUser?.email + getString(R.string.alarm_follow)
+        fcmPush?.sendMessage(destinationUid!!, "알림 메세지 입니다.", message)
     }
 
     fun requestFollow() {

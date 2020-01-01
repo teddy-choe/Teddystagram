@@ -75,17 +75,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1)
         //Set default screen
         bottom_navigation.selectedItemId = R.id.action_home
-        //registerPushToken()
+        registerPushToken()
     }
 
-    /*fun registerPushToken(){
+    fun registerPushToken(){
         var pushToken = FirebaseInstanceId.getInstance().token
         var uid = FirebaseAuth.getInstance().currentUser?.uid
         var map = mutableMapOf<String,Any>()
 
         map["pushToken"] = pushToken!!
         FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
-    }*/
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
