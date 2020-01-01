@@ -26,7 +26,6 @@ import java.util.*
 class LoginActivity : AppCompatActivity() {
     var auth : FirebaseAuth? = null // 로그인을 관리해주는 변수
     var googleSignInClient : GoogleSignInClient? = null
-
     var GOOGLE_LOGIN_CODE = 9001
     var callbackManager: CallbackManager? = null
 
@@ -47,17 +46,16 @@ class LoginActivity : AppCompatActivity() {
         }
 
         var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // 구글 시작 전 세팅
+                .requestIdToken("576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com") // 구글 시작 전 세팅
                 .requestEmail()
                 .build() // 조립 완성 의미
         googleSignInClient = GoogleSignIn.getClient(this, gso)
         callbackManager = CallbackManager.Factory.create() // 페이스북 콜백 매니저 초기화
-
     }
 
     override fun onStart() {
         super.onStart()
-        moveMainPage(auth?.currentUser)
+        moveMainPage(auth?.currentUser) // 자동 로그인 기능
     }
 
     /*
@@ -81,29 +79,31 @@ class LoginActivity : AppCompatActivity() {
      */
     fun signinEmail(){
         auth?.signInWithEmailAndPassword(email_edittext.text.toString(),password_edittext.text.toString())
-                ?.addOnCompleteListener { task ->
+                ?.addOnCompleteListener {
+                    task ->
                     if (task.isSuccessful){
                         moveMainPage(auth?.currentUser)
-                        Toast.makeText(this,"로그인이 성공했습니다.",Toast.LENGTH_LONG).show()
-                    } else {
+                    } else if (task.exception?.message.isNullOrEmpty()) {
+                        Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
+                    }
+                    else {
                         Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
                     }
                 }
     }
+
     fun moveMainPage(user : FirebaseUser?){
         if(user != null){
             startActivity(Intent(this,MainActivity::class.java))
             finish()
         }
     }
+
     fun googleLogin(){
-        var signInIntent =googleSignInClient?.signInIntent
+        var signInIntent = googleSignInClient?.signInIntent
         startActivityForResult(signInIntent,GOOGLE_LOGIN_CODE)
     }
-    fun firebaseAuthWithGoogle(account: GoogleSignInAccount){
-        var credential = GoogleAuthProvider.getCredential(account.idToken,null)
-        auth?.signInWithCredential(credential)
-    }
+
     fun facebookLogin(){
         LoginManager
                 .getInstance()
@@ -123,6 +123,7 @@ class LoginActivity : AppCompatActivity() {
 
         })
     }
+
     fun handleFacebookAccessToken(token: AccessToken?){
         var credential = FacebookAuthProvider.getCredential(token?.token!!)
         auth?.signInWithCredential(credential)?.addOnCompleteListener {
@@ -149,5 +150,21 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuthWithGoogle(account!!)
             }
         }
+    }
+
+    fun firebaseAuthWithGoogle(account: GoogleSignInAccount?){
+        var credential = GoogleAuthProvider.getCredential(account?.idToken,null)
+        auth?.signInWithCredential(credential)
+                ?.addOnCompleteListener {
+                    task ->
+                    if (task.isSuccessful){
+                        moveMainPage(auth?.currentUser)
+                    } else if (task.exception?.message.isNullOrEmpty()) {
+                        Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
+                    }
+                }
     }
 }
