@@ -77,7 +77,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         bottom_navigation.selectedItemId = R.id.action_home
     }
 
-    /*
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -90,8 +89,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }.addOnSuccessListener { uri ->
                 var map = HashMap<String, Any>()
                 map["image"] = uri.toString()
-                FirebaseFirestore.getInstance().collection("profile").document(uid).set(map)
+                FirebaseFirestore.getInstance().collection("profileImages").document(uid).set(map)
             }
         }
-    }*/
+    }
 }
