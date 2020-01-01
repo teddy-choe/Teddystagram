@@ -17,6 +17,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.LoginActivity
 import com.example.teddystagram.MainActivity
 import com.example.teddystagram.R
+import com.example.teddystagram.navigation.model.AlarmDTO
 import com.example.teddystagram.navigation.model.ContentDTO
 import com.example.teddystagram.navigation.model.FollowDTO
 import com.google.firebase.auth.FirebaseAuth
@@ -102,6 +103,18 @@ class UserFragment : Fragment() {
         }
     }
 
+    fun followerAlarm(destinationUid: String) {
+        var alarmDTO = AlarmDTO()
+        alarmDTO.destinationUid = destinationUid
+        alarmDTO.userId = auth?.currentUser!!.email
+        alarmDTO.uid = auth?.currentUser!!.uid
+        alarmDTO.kind = 2
+        alarmDTO.timestamp = System.currentTimeMillis()
+
+        FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
+        //var message = auth?.currentUser?.email + getString(R.string.alarm_follow)
+        //fcmPush?.sendMessage(destinationUid!!, "알림 메세지 입니다.", message)
+    }
 
     fun requestFollow() {
         var tsDocFollowing = firestore!!.collection("users").document(currentUserUid!!)
@@ -112,7 +125,7 @@ class UserFragment : Fragment() {
                 followDTO = FollowDTO()
                 followDTO.followingCount = 1
                 followDTO.followings[uid!!] = true
-
+                followerAlarm(uid!!)
                 transaction.set(tsDocFollowing, followDTO)
                 return@runTransaction
             }
@@ -122,6 +135,7 @@ class UserFragment : Fragment() {
                 followDTO?.followings.remove(uid)
             } else {
                 followDTO.followingCount = followDTO.followingCount + 1
+                followerAlarm(uid!!)
                 followDTO.followings[uid!!] = true
             }
             transaction.set(tsDocFollowing, followDTO)

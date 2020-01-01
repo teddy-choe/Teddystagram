@@ -31,6 +31,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.0.5'
     implementation 'com.google.firebase:firebase-storage:16.0.5' // 사진 업로드 기능 스토리지 추가
     implementation 'com.google.firebase:firebase-firestore:18.0.0'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4' // 클라우드 메세징 라이브러리
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.R
+import com.example.teddystagram.navigation.model.AlarmDTO
 import com.example.teddystagram.navigation.model.ContentDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,27 +40,25 @@ class CommentActivity : AppCompatActivity() {
             comment.timestamp = System.currentTimeMillis()
 
             FirebaseFirestore.getInstance().collection("images").document(contentUid!!).collection("comments").document().set(comment)
-
+            commentAlarm(destinationUid!!, comment_edit_message.text.toString())
             //commentAlarm(destinationUid!!,comment_edit_message.text.toString())
             comment_edit_message.setText("")
         }
-
     }
 
-    /*fun commentAlarm(destinationUid: String,message: String){
+    fun commentAlarm(destinationUid: String,message: String){
         var alarmDTO = AlarmDTO()
         alarmDTO.destinationUid =  destinationUid
-        alarmDTO.userId = user?.currentUser?.email
-        alarmDTO.uid = user?.currentUser?.uid
+        alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
+        alarmDTO.uid = FirebaseAuth.getInstance().currentUser?.uid
         alarmDTO.kind = 1
         alarmDTO.message = message
         alarmDTO.timestamp = System.currentTimeMillis()
 
         FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
-
-        var message = user?.currentUser?.email + getString(R.string.alarm_who) + message + getString(R.string.alarm_comment)
-        fcmPush?.sendMessage(destinationUid,"알림 메세지 입니다.",message)
-    }*/
+        //var message = user?.currentUser?.email + getString(R.string.alarm_who) + message + getString(R.string.alarm_comment)
+        //fcmPush?.sendMessage(destinationUid,"알림 메세지 입니다.",message)
+    }
 
     inner class CommentRecylcerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
         val comments :ArrayList<ContentDTO.Comment> = arrayListOf()
