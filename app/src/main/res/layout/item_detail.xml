@@ -43,6 +43,7 @@
             android:layout_height="35dp"/>
     </LinearLayout>
     <TextView
+        android:layout_marginLeft="8dp"
         android:id="@+id/detailviewitem_favoritecounter_textview"
         android:text="like 0"
         android:layout_width="wrap_content"
