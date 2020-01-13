@@ -15,6 +15,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -24,7 +25,7 @@ import java.util.*
 
 
 class LoginActivity : AppCompatActivity() {
-    var auth : FirebaseAuth? = null // 로그인을 관리해주는 변수
+    private lateinit var auth: FirebaseAuth // declare FirebaseAuth instance
     var googleSignInClient : GoogleSignInClient? = null
     var GOOGLE_LOGIN_CODE = 9001
     var callbackManager: CallbackManager? = null
@@ -32,30 +33,37 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
         auth = FirebaseAuth.getInstance()
+
+        /*
+         * 서버의 클라이언트 ID를 requestIdToken에 전달
+         */
+        var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com")
+                .requestEmail()
+                .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        callbackManager = CallbackManager.Factory.create() // 페이스북 콜백 매니저 초기화
+
+        //이메일 로그인
         email_login_button.setOnClickListener {
             createAndLoginEmail()
         }
-
+        //구글 로그인
         google_sign_in_button.setOnClickListener {
             googleLogin()
         }
-
+        //페이스북 로그인
         facebook_login_button.setOnClickListener {
             facebookLogin()
         }
-
-        var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com") // 구글 시작 전 세팅
-                .requestEmail()
-                .build() // 조립 완성 의미
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-        callbackManager = CallbackManager.Factory.create() // 페이스북 콜백 매니저 초기화
     }
 
     override fun onStart() {
         super.onStart()
-        moveMainPage(auth?.currentUser) // 자동 로그인 기능
+        moveMainPage(auth?.currentUser) // 사용자가 현재 로그인되있는지 확인, 되있으면 moveMainPage
     }
 
     /*
@@ -69,7 +77,7 @@ class LoginActivity : AppCompatActivity() {
             } else if (task.exception?.message.isNullOrEmpty()){
                 Toast.makeText(this,task.exception?.message,Toast.LENGTH_SHORT).show()
             } else {
-                signinEmail()
+                signinEmail() // 가입이 완료된 유저이면 로그인함
             }
         }
     }
@@ -107,7 +115,7 @@ class LoginActivity : AppCompatActivity() {
     fun facebookLogin(){
         LoginManager
                 .getInstance()
-                .logInWithReadPermissions(this,Arrays.asList("public_profile","email"))
+                .logInWithReadPermissions(this,Arrays.asList("email","public_profile"))
         LoginManager.getInstance().registerCallback(callbackManager,object : FacebookCallback<LoginResult>{
             override fun onSuccess(result: LoginResult?) {
                 handleFacebookAccessToken(result?.accessToken)
@@ -130,6 +138,11 @@ class LoginActivity : AppCompatActivity() {
             task ->
             if (task.isSuccessful){
                 moveMainPage(auth?.currentUser)
+            } else if (task.exception?.message.isNullOrEmpty()) {
+                Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
+            }
+            else {
+                Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -141,19 +154,30 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        callbackManager?.onActivityResult(requestCode,requestCode,data)
+        callbackManager?.onActivityResult(requestCode,resultCode,data)
 
+        /*
+         * 구글 로그인
+         */
         if (requestCode == GOOGLE_LOGIN_CODE) {
-            var result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            if(result.isSuccess){
-                var account = result.signInAccount
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)
                 firebaseAuthWithGoogle(account!!)
+            } catch (e: ApiException) {
+
             }
         }
     }
 
+    /*
+     * GoogleSignInAccount에서 ID토큰을 받아와서
+     * Firebase 사용자 인증 정보로 교환하고
+     * 해당 정보를 사용해 Firebase 인증을 받는다.
+     */
+
     fun firebaseAuthWithGoogle(account: GoogleSignInAccount?){
-        var credential = GoogleAuthProvider.getCredential(account?.idToken,null)
+        var credential = GoogleAuthProvider.getCredential(account?.idToken,null) // 사용자 인증 정보
         auth?.signInWithCredential(credential)
                 ?.addOnCompleteListener {
                     task ->
