@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.FcmPush
 import com.example.teddystagram.R
 import com.example.teddystagram.navigation.model.AlarmDTO
@@ -16,6 +17,7 @@ import com.example.teddystagram.navigation.model.ContentDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_detail.view.*
+import kotlinx.android.synthetic.main.fragment_user.view.*
 import kotlinx.android.synthetic.main.item_detail.view.*
 
 class DetailViewFragment : Fragment() {
@@ -27,7 +29,7 @@ class DetailViewFragment : Fragment() {
         var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail,container,false)
         firestore = FirebaseFirestore.getInstance()
         uid = FirebaseAuth.getInstance().currentUser?.uid
-        fcmPush = FcmPush()
+        //fcmPush = FcmPush()
 
         view.detailviewfragment_recyclerview.adapter = DetailViewRecyclerViewAdapter()
         view.detailviewfragment_recyclerview.layoutManager = LinearLayoutManager(activity)
@@ -67,6 +69,15 @@ class DetailViewFragment : Fragment() {
 
         override fun onBindViewHolder(p0: RecyclerView.ViewHolder, p1: Int) {
             var viewholder = (p0 as CustomViewHolder).itemView
+
+            //ProfileImage
+            firestore?.collection("profileImages")?.document(contentDTOs[p1].uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                if (documentSnapshot == null) return@addSnapshotListener
+                if (documentSnapshot.data != null) {
+                    var url = documentSnapshot?.data!!["image"]
+                    Glide.with(p0.itemView.context).load(url).apply(RequestOptions().circleCrop()).into(viewholder.detailviewitem_profile_image)
+                }
+            }
 
             //UserId
             viewholder.detailviewitem_profile_textview.text = contentDTOs!![p1].userId

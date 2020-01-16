@@ -54,6 +54,11 @@ class UserFragment : Fragment() {
                 startActivity(Intent(activity, LoginActivity::class.java))
                 auth?.signOut()
             }
+            fragmentView?.account_iv_profile?.setOnClickListener {
+                var photoPickerIntent = Intent(Intent.ACTION_PICK)
+                photoPickerIntent.type = "image/*"
+                activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
+            }
         } else {
             //제3자의 유저페이지
             fragmentView?.account_btn_follow_signout?.text = getString(R.string.follow)
@@ -73,11 +78,6 @@ class UserFragment : Fragment() {
         fragmentView?.account_recyclerview?.adapter = UserFragmentRecyclerViewAdapter()
         fragmentView?.account_recyclerview?.layoutManager = GridLayoutManager(activity!!, 3)
 
-        fragmentView?.account_iv_profile?.setOnClickListener {
-            var photoPickerIntent = Intent(Intent.ACTION_PICK)
-            photoPickerIntent.type = "image/*"
-            activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
-        }
         getProfileImages()
         getFollowerAndFollowing()
         return fragmentView
