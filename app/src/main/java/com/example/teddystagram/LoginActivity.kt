@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.teddystagram.LoginPresenter.LoginContract
+import com.example.teddystagram.LoginPresenter.LoginPresenter
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -24,15 +26,19 @@ import kotlinx.android.synthetic.main.activity_login.*
 import java.util.*
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), LoginContract {
     private lateinit var auth: FirebaseAuth // declare FirebaseAuth instance
     var googleSignInClient : GoogleSignInClient? = null
     var GOOGLE_LOGIN_CODE = 9001
     var callbackManager: CallbackManager? = null
 
+    var loginPresenter : LoginPresenter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        //loginPresenter?.attachView(view = null)
 
         auth = FirebaseAuth.getInstance()
 
@@ -190,5 +196,10 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
                     }
                 }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loginPresenter?.detachView()
     }
 }

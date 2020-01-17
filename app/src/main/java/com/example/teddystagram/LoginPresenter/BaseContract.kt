@@ -1,4 +1,4 @@
-package com.example.teddystagram
+package com.example.teddystagram.LoginPresenter
 
 class BaseContract {
 

@@ -1,9 +1,9 @@
-package com.example.teddystagram
+package com.example.teddystagram.LoginPresenter
 
 import com.google.firebase.firestore.auth.User
 
 
-interface MainContract {
+interface LoginContract {
 
     interface View : BaseContract.View {
 
@@ -23,10 +23,8 @@ interface MainContract {
 
         override fun setView(view: View)
 
-        override fun releaseView()
+        fun attachView(view: View?)
 
-        fun loadData()
-
-        fun setRxEvent()
+        fun detachView()
     }
 }
