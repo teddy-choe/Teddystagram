@@ -44,7 +44,7 @@ class UserFragment : Fragment() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
-        fcmPush = FcmPush()
+        //fcmPush = FcmPush()
 
         if (uid == currentUserUid) {
             //나의 유저페이지
@@ -53,6 +53,11 @@ class UserFragment : Fragment() {
                 activity?.finish()
                 startActivity(Intent(activity, LoginActivity::class.java))
                 auth?.signOut()
+            }
+            fragmentView?.account_iv_profile?.setOnClickListener {
+                var photoPickerIntent = Intent(Intent.ACTION_PICK)
+                photoPickerIntent.type = "image/*"
+                activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
             }
         } else {
             //제3자의 유저페이지
@@ -73,22 +78,27 @@ class UserFragment : Fragment() {
         fragmentView?.account_recyclerview?.adapter = UserFragmentRecyclerViewAdapter()
         fragmentView?.account_recyclerview?.layoutManager = GridLayoutManager(activity!!, 3)
 
-        fragmentView?.account_iv_profile?.setOnClickListener {
-            var photoPickerIntent = Intent(Intent.ACTION_PICK)
-            photoPickerIntent.type = "image/*"
-            activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
-        }
         getProfileImages()
         getFollowerAndFollowing()
         return fragmentView
     }
 
-    fun getFollowerAndFollowing() {firestore?.collection("users")?.document(uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-            if (documentSnapshot == null) return@addSnapshotListener
+
+    /*
+     * snapshotListener를 통해서 user collection 안의 팔로우 팔로잉 데이터를 가져옵니다
+     */
+    fun getFollowerAndFollowing() {
+        firestore?.collection("users")?.document(uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+
+            if (documentSnapshot == null)
+                return@addSnapshotListener
+
             var followDTO = documentSnapshot.toObject(FollowDTO::class.java)
+
             if (followDTO?.followingCount != null) {
                 fragmentView?.account_tv_following_count?.text = followDTO?.followingCount?.toString()
             }
+
             if (followDTO?.followerCount != null){
                 fragmentView?.account_tv_follower_count?.text = followDTO?.followerCount?.toString()
                 if (followDTO?.followers?.containsKey(currentUserUid)!!){

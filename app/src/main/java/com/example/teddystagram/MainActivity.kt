@@ -87,6 +87,9 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
     }
 
+    /*
+     * push profileImageUrl to Firestore.collection(profileimage)
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
