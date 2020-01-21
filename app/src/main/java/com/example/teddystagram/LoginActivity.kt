@@ -27,7 +27,11 @@ import java.util.*
 
 
 class LoginActivity : AppCompatActivity(), LoginContract {
-    private lateinit var auth: FirebaseAuth // declare FirebaseAuth instance
+
+    private var view : LoginContract.View? = null
+
+    private var auth: FirebaseAuth? = null // declare FirebaseAuth instance
+
     var googleSignInClient : GoogleSignInClient? = null
     var GOOGLE_LOGIN_CODE = 9001
     var callbackManager: CallbackManager? = null
@@ -37,8 +41,6 @@ class LoginActivity : AppCompatActivity(), LoginContract {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
-        //loginPresenter?.attachView(view = null)
 
         auth = FirebaseAuth.getInstance()
 
@@ -196,10 +198,5 @@ class LoginActivity : AppCompatActivity(), LoginContract {
                         Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
                     }
                 }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        loginPresenter?.detachView()
     }
 }

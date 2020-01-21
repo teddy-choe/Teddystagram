@@ -5,26 +5,23 @@ import com.google.firebase.firestore.auth.User
 
 interface LoginContract {
 
-    interface View : BaseContract.View {
+    interface View {
 
-        fun showProgress()
+        fun goToMain()
 
-        fun hideProgress()
-
-        fun showToast(message: String)
-
-        fun setItems(items: ArrayList<User>)
-
-        fun updateView(user: User)
+        fun completeSignup()
 
     }
 
-    interface Presenter : BaseContract.Presenter<View> {
+    interface Presenter {
 
-        override fun setView(view: View)
+        fun doGoogleLogin()
 
-        fun attachView(view: View?)
+        fun doFacebookLogin()
 
-        fun detachView()
+        fun doEmailLogin()
+
+        fun doEmailSignup()
+
     }
 }
