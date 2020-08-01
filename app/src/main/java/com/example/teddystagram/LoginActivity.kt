@@ -24,29 +24,16 @@ import java.util.*
 
 
 class LoginActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth // declare FirebaseAuth instance
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()// declare FirebaseAuth instance
+    val callbackManager = CallbackManager.Factory.create() // declare Facebook CallbackManager
     var googleSignInClient : GoogleSignInClient? = null
-    var GOOGLE_LOGIN_CODE = 9001
-    var callbackManager: CallbackManager? = null
+    val GOOGLE_LOGIN_CODE = 9001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        //loginPresenter?.attachView(view = null)
-
-        auth = FirebaseAuth.getInstance()
-
-        /*
-         * 서버의 클라이언트 ID를 requestIdToken에 전달
-         */
-        var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com")
-                .requestEmail()
-                .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-        callbackManager = CallbackManager.Factory.create() // 페이스북 콜백 매니저 초기화
+        setGoogleSigninClient()
 
         //이메일 로그인
         email_login_button.setOnClickListener {
@@ -60,6 +47,18 @@ class LoginActivity : AppCompatActivity() {
         facebook_login_button.setOnClickListener {
             facebookLogin()
         }
+    }
+
+    private fun setGoogleSigninClient() {
+        /*
+         * 서버의 클라이언트 ID를 requestIdToken에 전달
+         */
+        var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com")
+                .requestEmail()
+                .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
     override fun onStart() {
@@ -176,7 +175,6 @@ class LoginActivity : AppCompatActivity() {
      * Firebase 사용자 인증 정보로 교환하고
      * 해당 정보를 사용해 Firebase 인증을 받는다.
      */
-
     fun firebaseAuthWithGoogle(account: GoogleSignInAccount?){
         var credential = GoogleAuthProvider.getCredential(account?.idToken,null) // 사용자 인증 정보
         auth?.signInWithCredential(credential)
