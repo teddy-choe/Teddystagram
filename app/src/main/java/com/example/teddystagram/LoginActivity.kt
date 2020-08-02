@@ -1,7 +1,9 @@
 package com.example.teddystagram
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.AccessToken
@@ -20,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.activity_login.*
+import sun.jvm.hotspot.utilities.IntArray
 import java.util.*
 
 
@@ -28,6 +31,17 @@ class LoginActivity : AppCompatActivity() {
     val callbackManager = CallbackManager.Factory.create() // declare Facebook CallbackManager
     var googleSignInClient : GoogleSignInClient? = null
     val GOOGLE_LOGIN_CODE = 9001
+
+    // 세션 콜백 구현
+    private val sessionCallback: ISessionCallback = object : ISessionCallback() {
+        fun onSessionOpened() {
+            Log.i("KAKAO_SESSION", "로그인 성공")
+        }
+
+        fun onSessionOpenFailed(exception: KakaoException?) {
+            Log.e("KAKAO_SESSION", "로그인 실패", exception)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +61,17 @@ class LoginActivity : AppCompatActivity() {
         facebook_login_button.setOnClickListener {
             facebookLogin()
         }
+
+        // SDK 초기화
+        KakaoSDK.init(object : KakaoAdapter() {
+            val applicationConfig: IApplicationConfig?
+                get() = object : IApplicationConfig() {
+                    val applicationContext: Context?
+                        get() = this@MyApplication
+                }
+        })
+
+        Session.getCurrentSession().addCallback(sessionCallback);
     }
 
     private fun setGoogleSigninClient() {
