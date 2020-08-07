@@ -21,8 +21,9 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.kakao.auth.*
+import com.kakao.util.exception.KakaoException
 import kotlinx.android.synthetic.main.activity_login.*
-import sun.jvm.hotspot.utilities.IntArray
 import java.util.*
 
 
@@ -33,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
     val GOOGLE_LOGIN_CODE = 9001
 
     // 세션 콜백 구현
-    private val sessionCallback: ISessionCallback = object : ISessionCallback() {
+/*    private val sessionCallback: ISessionCallback = object : ISessionCallback() {
         fun onSessionOpened() {
             Log.i("KAKAO_SESSION", "로그인 성공")
         }
@@ -41,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
         fun onSessionOpenFailed(exception: KakaoException?) {
             Log.e("KAKAO_SESSION", "로그인 실패", exception)
         }
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,15 +64,15 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // SDK 초기화
-        KakaoSDK.init(object : KakaoAdapter() {
+        /*KakaoSDK.init(object : KakaoAdapter() {
             val applicationConfig: IApplicationConfig?
                 get() = object : IApplicationConfig() {
                     val applicationContext: Context?
                         get() = this@MyApplication
                 }
-        })
+        })*/
 
-        Session.getCurrentSession().addCallback(sessionCallback);
+        //Session.getCurrentSession().addCallback(sessionCallback)
     }
 
     private fun setGoogleSigninClient() {
