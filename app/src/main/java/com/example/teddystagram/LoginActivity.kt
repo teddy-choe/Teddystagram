@@ -79,14 +79,22 @@ class LoginActivity : AppCompatActivity() {
      * 이메일 주소를 통해 회원가입을 합니다.
      */
     fun createAndLoginEmail(view: View){
-        auth?.createUserWithEmailAndPassword(email_edittext.text.toString(),password_edittext.text.toString())?.addOnCompleteListener {
-            task ->
+        if (email_edittext.text.toString().isEmpty() ||
+            password_edittext.text.toString().isEmpty()) {
+            Toast.makeText(this, getString(R.string.empty_email_password), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        auth.createUserWithEmailAndPassword(
+            email_edittext.text.toString(),
+            password_edittext.text.toString()
+        ).addOnCompleteListener { task ->
             if (task.isSuccessful){
-                Toast.makeText(this,"아이디 생성이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,getString(R.string.complete_id), Toast.LENGTH_SHORT).show()
             } else if (task.exception?.message.isNullOrEmpty()){
                 Toast.makeText(this,task.exception?.message,Toast.LENGTH_SHORT).show()
             } else {
-                signinEmail() // 가입이 완료된 유저이면 로그인함
+                signinEmail()
             }
         }
     }
@@ -94,7 +102,7 @@ class LoginActivity : AppCompatActivity() {
     /*
      * 이메일 주소를 통해 로그인을 합니다.
      */
-    fun signinEmail(){
+    private fun signinEmail(){
         auth?.signInWithEmailAndPassword(email_edittext.text.toString(),password_edittext.text.toString())
                 ?.addOnCompleteListener {
                     task ->
@@ -109,7 +117,7 @@ class LoginActivity : AppCompatActivity() {
                 }
     }
 
-    fun moveMainPage(user : FirebaseUser?){
+    private fun moveMainPage(user : FirebaseUser?){
         if(user != null){
             startActivity(Intent(this,MainActivity::class.java))
             finish()
