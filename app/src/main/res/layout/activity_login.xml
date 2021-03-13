@@ -76,6 +76,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="15dp"
             android:text="@string/signin_email"
+            android:onClick="createAndLoginEmail"
             android:theme="@style/ButtonStyle" />
 
         <Button
@@ -86,6 +87,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:background="@drawable/btn_signin_google"
+            android:onClick="googleLogin"
             android:text="@string/signin_google"
             android:textColor="@color/colorWhite" />
 
@@ -99,6 +101,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:background="@drawable/btn_signin_facebook"
+            android:onClick="facebookLogin"
             android:text="@string/signin_facebook"
             android:textColor="@color/colorWhite" />
 

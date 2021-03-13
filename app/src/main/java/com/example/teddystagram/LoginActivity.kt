@@ -1,9 +1,8 @@
 package com.example.teddystagram
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.AccessToken
@@ -21,11 +20,8 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.kakao.auth.*
-import com.kakao.util.exception.KakaoException
 import kotlinx.android.synthetic.main.activity_login.*
 import java.util.*
-
 
 class LoginActivity : AppCompatActivity() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()// declare FirebaseAuth instance
@@ -49,19 +45,6 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         setGoogleSigninClient()
-
-        //이메일 로그인
-        email_login_button.setOnClickListener {
-            createAndLoginEmail()
-        }
-        //구글 로그인
-        google_sign_in_button.setOnClickListener {
-            googleLogin()
-        }
-        //페이스북 로그인
-        facebook_login_button.setOnClickListener {
-            facebookLogin()
-        }
 
         // SDK 초기화
         /*KakaoSDK.init(object : KakaoAdapter() {
@@ -95,7 +78,7 @@ class LoginActivity : AppCompatActivity() {
     /*
      * 이메일 주소를 통해 회원가입을 합니다.
      */
-    fun createAndLoginEmail(){
+    fun createAndLoginEmail(view: View){
         auth?.createUserWithEmailAndPassword(email_edittext.text.toString(),password_edittext.text.toString())?.addOnCompleteListener {
             task ->
             if (task.isSuccessful){
@@ -133,12 +116,12 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    fun googleLogin(){
+    fun googleLogin(view: View){
         var signInIntent = googleSignInClient?.signInIntent
         startActivityForResult(signInIntent,GOOGLE_LOGIN_CODE)
     }
 
-    fun facebookLogin(){
+    fun facebookLogin(view: View){
         LoginManager
                 .getInstance()
                 .logInWithReadPermissions(this,Arrays.asList("email","public_profile"))
