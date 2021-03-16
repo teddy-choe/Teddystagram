@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import com.example.teddystagram.databinding.ActivityLoginBinding
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -20,14 +22,13 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.android.synthetic.main.activity_login.*
 import java.util.*
 
 class LoginActivity : AppCompatActivity() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()// declare FirebaseAuth instance
-    val callbackManager = CallbackManager.Factory.create() // declare Facebook CallbackManager
-    var googleSignInClient : GoogleSignInClient? = null
-    val GOOGLE_LOGIN_CODE = 9001
+    private val callbackManager = CallbackManager.Factory.create() // declare Facebook CallbackManager
+    private var googleSignInClient: GoogleSignInClient? = null
+    private lateinit var binding: ActivityLoginBinding
 
     // 세션 콜백 구현
 /*    private val sessionCallback: ISessionCallback = object : ISessionCallback() {
@@ -42,7 +43,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = DataBindingUtil.inflate(layoutInflater, R.layout.activity_login, null, false)
 
         setGoogleSigninClient()
 
@@ -62,37 +63,32 @@ class LoginActivity : AppCompatActivity() {
         /*
          * 서버의 클라이언트 ID를 requestIdToken에 전달
          */
-        var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        googleSignInClient = GoogleSignIn.getClient(
+            this,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com")
                 .requestEmail()
-                .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        moveMainPage(auth.currentUser) // 사용자가 현재 로그인되있는지 확인, 되있으면 moveMainPage
+                .build())
     }
 
     /*
      * 이메일 주소를 통해 회원가입을 합니다.
      */
-    fun createAndLoginEmail(view: View){
-        if (email_edittext.text.toString().isEmpty() ||
-            password_edittext.text.toString().isEmpty()) {
+    fun createAndLoginEmail(view: View) {
+        if (binding.emailEdittext.text.toString().isEmpty() ||
+            binding.passwordEdittext.text.toString().isEmpty()) {
             Toast.makeText(this, getString(R.string.empty_email_password), Toast.LENGTH_SHORT).show()
             return
         }
 
         auth.createUserWithEmailAndPassword(
-            email_edittext.text.toString(),
-            password_edittext.text.toString()
+            binding.emailEdittext.text.toString(),
+            binding.passwordEdittext.text.toString()
         ).addOnCompleteListener { task ->
-            if (task.isSuccessful){
-                Toast.makeText(this,getString(R.string.complete_id), Toast.LENGTH_SHORT).show()
-            } else if (task.exception?.message.isNullOrEmpty()){
-                Toast.makeText(this,task.exception?.message,Toast.LENGTH_SHORT).show()
+            if (task.isSuccessful) {
+                Toast.makeText(this, getString(R.string.complete_id), Toast.LENGTH_SHORT).show()
+            } else if (task.exception?.message.isNullOrEmpty()) {
+                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
             } else {
                 signinEmail()
             }
@@ -102,38 +98,38 @@ class LoginActivity : AppCompatActivity() {
     /*
      * 이메일 주소를 통해 로그인을 합니다.
      */
-    private fun signinEmail(){
-        auth.signInWithEmailAndPassword(email_edittext.text.toString(),password_edittext.text.toString())
-                .addOnCompleteListener {
-                    task ->
-                    if (task.isSuccessful){
-                        moveMainPage(auth.currentUser)
-                    } else if (task.exception?.message.isNullOrEmpty()) {
-                        Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
-                    }
-                    else {
-                        Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
-                    }
+    private fun signinEmail() {
+        auth.signInWithEmailAndPassword(
+            binding.emailEdittext.text.toString(),
+            binding.passwordEdittext.text.toString()
+        ).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    moveMainPage(auth.currentUser)
+                } else if (task.exception?.message.isNullOrEmpty()) {
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
                 }
+            }
     }
 
-    private fun moveMainPage(user : FirebaseUser?){
-        if(user != null){
-            startActivity(Intent(this,MainActivity::class.java))
+    private fun moveMainPage(user: FirebaseUser?) {
+        if (user != null) {
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
     }
 
-    fun googleLogin(view: View){
-        var signInIntent = googleSignInClient?.signInIntent
-        startActivityForResult(signInIntent,GOOGLE_LOGIN_CODE)
+    fun googleLogin(view: View) {
+        val signInIntent = googleSignInClient?.signInIntent
+        startActivityForResult(signInIntent, GOOGLE_LOGIN_CODE)
     }
 
-    fun facebookLogin(view: View){
+    fun facebookLogin(view: View) {
         LoginManager
-                .getInstance()
-                .logInWithReadPermissions(this,Arrays.asList("email","public_profile"))
-        LoginManager.getInstance().registerCallback(callbackManager,object : FacebookCallback<LoginResult>{
+            .getInstance()
+            .logInWithReadPermissions(this, Arrays.asList("email", "public_profile"))
+        LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(result: LoginResult?) {
                 handleFacebookAccessToken(result?.accessToken)
             }
@@ -149,17 +145,15 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    fun handleFacebookAccessToken(token: AccessToken?){
+    fun handleFacebookAccessToken(token: AccessToken?) {
         var credential = FacebookAuthProvider.getCredential(token?.token!!)
-        auth.signInWithCredential(credential).addOnCompleteListener {
-            task ->
-            if (task.isSuccessful){
+        auth.signInWithCredential(credential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
                 moveMainPage(auth.currentUser)
             } else if (task.exception?.message.isNullOrEmpty()) {
-                Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
-            }
-            else {
-                Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
+                Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -171,7 +165,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        callbackManager?.onActivityResult(requestCode,resultCode,data)
+        callbackManager?.onActivityResult(requestCode, resultCode, data)
 
         /*
          * 구글 로그인
@@ -192,19 +186,21 @@ class LoginActivity : AppCompatActivity() {
      * Firebase 사용자 인증 정보로 교환하고
      * 해당 정보를 사용해 Firebase 인증을 받는다.
      */
-    fun firebaseAuthWithGoogle(account: GoogleSignInAccount?){
-        var credential = GoogleAuthProvider.getCredential(account?.idToken,null) // 사용자 인증 정보
+    fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
+        val credential = GoogleAuthProvider.getCredential(account?.idToken, null) // 사용자 인증 정보
         auth.signInWithCredential(credential)
-                .addOnCompleteListener {
-                    task ->
-                    if (task.isSuccessful){
-                        moveMainPage(auth.currentUser)
-                    } else if (task.exception?.message.isNullOrEmpty()) {
-                        Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
-                    }
-                    else {
-                        Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
-                    }
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    moveMainPage(auth.currentUser)
+                } else if (task.exception?.message.isNullOrEmpty()) {
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
                 }
+            }
+    }
+
+    companion object {
+        private const val GOOGLE_LOGIN_CODE = 9001
     }
 }
