@@ -72,7 +72,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        moveMainPage(auth?.currentUser) // 사용자가 현재 로그인되있는지 확인, 되있으면 moveMainPage
+        moveMainPage(auth.currentUser) // 사용자가 현재 로그인되있는지 확인, 되있으면 moveMainPage
     }
 
     /*
@@ -103,11 +103,11 @@ class LoginActivity : AppCompatActivity() {
      * 이메일 주소를 통해 로그인을 합니다.
      */
     private fun signinEmail(){
-        auth?.signInWithEmailAndPassword(email_edittext.text.toString(),password_edittext.text.toString())
-                ?.addOnCompleteListener {
+        auth.signInWithEmailAndPassword(email_edittext.text.toString(),password_edittext.text.toString())
+                .addOnCompleteListener {
                     task ->
                     if (task.isSuccessful){
-                        moveMainPage(auth?.currentUser)
+                        moveMainPage(auth.currentUser)
                     } else if (task.exception?.message.isNullOrEmpty()) {
                         Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
                     }
@@ -151,10 +151,10 @@ class LoginActivity : AppCompatActivity() {
 
     fun handleFacebookAccessToken(token: AccessToken?){
         var credential = FacebookAuthProvider.getCredential(token?.token!!)
-        auth?.signInWithCredential(credential)?.addOnCompleteListener {
+        auth.signInWithCredential(credential).addOnCompleteListener {
             task ->
             if (task.isSuccessful){
-                moveMainPage(auth?.currentUser)
+                moveMainPage(auth.currentUser)
             } else if (task.exception?.message.isNullOrEmpty()) {
                 Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
             }
@@ -166,7 +166,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        moveMainPage(auth?.currentUser)
+        moveMainPage(auth.currentUser)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -194,11 +194,11 @@ class LoginActivity : AppCompatActivity() {
      */
     fun firebaseAuthWithGoogle(account: GoogleSignInAccount?){
         var credential = GoogleAuthProvider.getCredential(account?.idToken,null) // 사용자 인증 정보
-        auth?.signInWithCredential(credential)
-                ?.addOnCompleteListener {
+        auth.signInWithCredential(credential)
+                .addOnCompleteListener {
                     task ->
                     if (task.isSuccessful){
-                        moveMainPage(auth?.currentUser)
+                        moveMainPage(auth.currentUser)
                     } else if (task.exception?.message.isNullOrEmpty()) {
                         Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG).show()
                     }
