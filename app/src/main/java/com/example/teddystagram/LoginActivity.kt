@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.Observer
 import com.example.teddystagram.databinding.ActivityLoginBinding
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
@@ -24,11 +26,13 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import java.util.*
 
+//TODO: 하나의 클래스에 모든 로직이 모여있어 수정하기 쉽지 않음. MVVM으로 리팩토링. 테스트 코드 추가 필요
 class LoginActivity : AppCompatActivity() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()// declare FirebaseAuth instance
     private val callbackManager = CallbackManager.Factory.create() // declare Facebook CallbackManager
     private var googleSignInClient: GoogleSignInClient? = null
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var viewModel: LoginViewModel
 
     // 세션 콜백 구현
 /*    private val sessionCallback: ISessionCallback = object : ISessionCallback() {
@@ -43,9 +47,12 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.inflate(layoutInflater, R.layout.activity_login, null, false)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+        viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
+        binding.viewModel = viewModel
 
         setGoogleSigninClient()
+        observeViewModel()
 
         // SDK 초기화
         /*KakaoSDK.init(object : KakaoAdapter() {
@@ -57,6 +64,16 @@ class LoginActivity : AppCompatActivity() {
         })*/
 
         //Session.getCurrentSession().addCallback(sessionCallback)
+    }
+
+    private fun observeViewModel() {
+        viewModel.showToastMessage.observe(this, Observer { message ->
+            Toast.makeText(this, getString(message), Toast.LENGTH_SHORT).show()
+        })
+
+        viewModel.onNavigateMainActivity.observe(this, Observer { currentUser ->
+            navigateMainActivity(currentUser)
+        })
     }
 
     private fun setGoogleSigninClient() {
@@ -74,46 +91,46 @@ class LoginActivity : AppCompatActivity() {
     /*
      * 이메일 주소를 통해 회원가입을 합니다.
      */
-    fun createAndLoginEmail(view: View) {
-        if (binding.emailEdittext.text.toString().isEmpty() ||
-            binding.passwordEdittext.text.toString().isEmpty()) {
-            Toast.makeText(this, getString(R.string.empty_email_password), Toast.LENGTH_SHORT).show()
-            return
-        }
+//    fun createAndLoginEmail(view: View) {
+//        if (binding.emailEdittext.text.toString().isEmpty() ||
+//            binding.passwordEdittext.text.toString().isEmpty()) {
+//            Toast.makeText(this, getString(R.string.empty_email_password), Toast.LENGTH_SHORT).show()
+//            return
+//        }
+//
+//        auth.createUserWithEmailAndPassword(
+//            binding.emailEdittext.text.toString(),
+//            binding.passwordEdittext.text.toString()
+//        ).addOnCompleteListener { task ->
+//            if (task.isSuccessful) {
+//                Toast.makeText(this, getString(R.string.complete_id), Toast.LENGTH_SHORT).show()
+//            } else if (task.exception?.message.isNullOrEmpty()) {
+//                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+//            } else {
+//                signinEmail()
+//            }
+//        }
+//    }
+//
+//    /*
+//     * 이메일 주소를 통해 로그인을 합니다.
+//     */
+//    private fun signinEmail() {
+//        auth.signInWithEmailAndPassword(
+//            binding.emailEdittext.text.toString(),
+//            binding.passwordEdittext.text.toString()
+//        ).addOnCompleteListener { task ->
+//                if (task.isSuccessful) {
+//                    navigateMainActivity(auth.currentUser)
+//                } else if (task.exception?.message.isNullOrEmpty()) {
+//                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
+//                } else {
+//                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
+//                }
+//            }
+//    }
 
-        auth.createUserWithEmailAndPassword(
-            binding.emailEdittext.text.toString(),
-            binding.passwordEdittext.text.toString()
-        ).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Toast.makeText(this, getString(R.string.complete_id), Toast.LENGTH_SHORT).show()
-            } else if (task.exception?.message.isNullOrEmpty()) {
-                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-            } else {
-                signinEmail()
-            }
-        }
-    }
-
-    /*
-     * 이메일 주소를 통해 로그인을 합니다.
-     */
-    private fun signinEmail() {
-        auth.signInWithEmailAndPassword(
-            binding.emailEdittext.text.toString(),
-            binding.passwordEdittext.text.toString()
-        ).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    moveMainPage(auth.currentUser)
-                } else if (task.exception?.message.isNullOrEmpty()) {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-                }
-            }
-    }
-
-    private fun moveMainPage(user: FirebaseUser?) {
+    private fun navigateMainActivity(user: FirebaseUser?) {
         if (user != null) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -149,7 +166,7 @@ class LoginActivity : AppCompatActivity() {
         var credential = FacebookAuthProvider.getCredential(token?.token!!)
         auth.signInWithCredential(credential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                moveMainPage(auth.currentUser)
+                navigateMainActivity(auth.currentUser)
             } else if (task.exception?.message.isNullOrEmpty()) {
                 Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
             } else {
@@ -160,7 +177,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        moveMainPage(auth.currentUser)
+        navigateMainActivity(auth.currentUser)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -191,7 +208,7 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    moveMainPage(auth.currentUser)
+                    navigateMainActivity(auth.currentUser)
                 } else if (task.exception?.message.isNullOrEmpty()) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
                 } else {

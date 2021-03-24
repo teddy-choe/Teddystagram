@@ -54,6 +54,7 @@
     <string name="back">Back</string>
     <string name="empty_email_password">이메일 혹은 비밀번호를 입력해주세요</string>
     <string name="complete_id">아이디 생성이 완료되었습니다</string>
+    <string name="error_login">로그인 중 오류가 발생했습니다</string>
 
     <!-- etc -->
     <item name="visible" type="id" />
