@@ -88,48 +88,6 @@ class LoginActivity : AppCompatActivity() {
                 .build())
     }
 
-    /*
-     * 이메일 주소를 통해 회원가입을 합니다.
-     */
-//    fun createAndLoginEmail(view: View) {
-//        if (binding.emailEdittext.text.toString().isEmpty() ||
-//            binding.passwordEdittext.text.toString().isEmpty()) {
-//            Toast.makeText(this, getString(R.string.empty_email_password), Toast.LENGTH_SHORT).show()
-//            return
-//        }
-//
-//        auth.createUserWithEmailAndPassword(
-//            binding.emailEdittext.text.toString(),
-//            binding.passwordEdittext.text.toString()
-//        ).addOnCompleteListener { task ->
-//            if (task.isSuccessful) {
-//                Toast.makeText(this, getString(R.string.complete_id), Toast.LENGTH_SHORT).show()
-//            } else if (task.exception?.message.isNullOrEmpty()) {
-//                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-//            } else {
-//                signinEmail()
-//            }
-//        }
-//    }
-//
-//    /*
-//     * 이메일 주소를 통해 로그인을 합니다.
-//     */
-//    private fun signinEmail() {
-//        auth.signInWithEmailAndPassword(
-//            binding.emailEdittext.text.toString(),
-//            binding.passwordEdittext.text.toString()
-//        ).addOnCompleteListener { task ->
-//                if (task.isSuccessful) {
-//                    navigateMainActivity(auth.currentUser)
-//                } else if (task.exception?.message.isNullOrEmpty()) {
-//                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-//                } else {
-//                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-//                }
-//            }
-//    }
-
     private fun navigateMainActivity(user: FirebaseUser?) {
         if (user != null) {
             startActivity(Intent(this, MainActivity::class.java))
