@@ -71,6 +71,10 @@ class LoginActivity : AppCompatActivity() {
             Toast.makeText(this, getString(message), Toast.LENGTH_SHORT).show()
         })
 
+        viewModel.showErrorMessage.observe(this, Observer { errorMessage ->
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        })
+
         viewModel.onNavigateMainActivity.observe(this, Observer { currentUser ->
             navigateMainActivity(currentUser)
         })
