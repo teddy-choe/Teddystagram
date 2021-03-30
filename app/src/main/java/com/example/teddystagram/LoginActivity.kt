@@ -27,23 +27,18 @@ import com.google.firebase.auth.GoogleAuthProvider
 import java.util.*
 
 //TODO: 하나의 클래스에 모든 로직이 모여있어 수정하기 쉽지 않음. MVVM으로 리팩토링. 테스트 코드 추가 필요
+//TODO: RequestToken을 캡슐화 할 필요가 있음
 class LoginActivity : AppCompatActivity() {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()// declare FirebaseAuth instance
-    private val callbackManager = CallbackManager.Factory.create() // declare Facebook CallbackManager
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val facebookCallbackManager = CallbackManager.Factory.create()
     private var googleSignInClient: GoogleSignInClient? = null
     private lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
 
-    // 세션 콜백 구현
-/*    private val sessionCallback: ISessionCallback = object : ISessionCallback() {
-        fun onSessionOpened() {
-            Log.i("KAKAO_SESSION", "로그인 성공")
-        }
-
-        fun onSessionOpenFailed(exception: KakaoException?) {
-            Log.e("KAKAO_SESSION", "로그인 실패", exception)
-        }
-    }*/
+    companion object {
+        private const val GOOGLE_LOGIN_CODE = 9001
+        private const val REQUEST_TOKEN = "576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,17 +48,6 @@ class LoginActivity : AppCompatActivity() {
 
         setGoogleSigninClient()
         observeViewModel()
-
-        // SDK 초기화
-        /*KakaoSDK.init(object : KakaoAdapter() {
-            val applicationConfig: IApplicationConfig?
-                get() = object : IApplicationConfig() {
-                    val applicationContext: Context?
-                        get() = this@MyApplication
-                }
-        })*/
-
-        //Session.getCurrentSession().addCallback(sessionCallback)
     }
 
     private fun observeViewModel() {
@@ -87,7 +71,7 @@ class LoginActivity : AppCompatActivity() {
         googleSignInClient = GoogleSignIn.getClient(
             this,
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("576141085480-s11e99saiuilf1vffocv9n7ak4o82fra.apps.googleusercontent.com")
+                .requestIdToken(REQUEST_TOKEN)
                 .requestEmail()
                 .build())
     }
@@ -108,7 +92,7 @@ class LoginActivity : AppCompatActivity() {
         LoginManager
             .getInstance()
             .logInWithReadPermissions(this, Arrays.asList("email", "public_profile"))
-        LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+        LoginManager.getInstance().registerCallback(facebookCallbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(result: LoginResult?) {
                 handleFacebookAccessToken(result?.accessToken)
             }
@@ -126,9 +110,9 @@ class LoginActivity : AppCompatActivity() {
 
     fun handleFacebookAccessToken(token: AccessToken?) {
         var credential = FacebookAuthProvider.getCredential(token?.token!!)
-        auth.signInWithCredential(credential).addOnCompleteListener { task ->
+        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                navigateMainActivity(auth.currentUser)
+                navigateMainActivity(firebaseAuth.currentUser)
             } else if (task.exception?.message.isNullOrEmpty()) {
                 Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
             } else {
@@ -137,14 +121,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        navigateMainActivity(auth.currentUser)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        callbackManager?.onActivityResult(requestCode, resultCode, data)
+        facebookCallbackManager?.onActivityResult(requestCode, resultCode, data)
 
         /*
          * 구글 로그인
@@ -155,7 +134,7 @@ class LoginActivity : AppCompatActivity() {
                 val account = task.getResult(ApiException::class.java)
                 firebaseAuthWithGoogle(account!!)
             } catch (e: ApiException) {
-
+                e.toString()
             }
         }
     }
@@ -165,21 +144,17 @@ class LoginActivity : AppCompatActivity() {
      * Firebase 사용자 인증 정보로 교환하고
      * 해당 정보를 사용해 Firebase 인증을 받는다.
      */
-    fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
         val credential = GoogleAuthProvider.getCredential(account?.idToken, null) // 사용자 인증 정보
-        auth.signInWithCredential(credential)
+        firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    navigateMainActivity(auth.currentUser)
+                    navigateMainActivity(firebaseAuth.currentUser)
                 } else if (task.exception?.message.isNullOrEmpty()) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
                 } else {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
                 }
             }
-    }
-
-    companion object {
-        private const val GOOGLE_LOGIN_CODE = 9001
     }
 }
