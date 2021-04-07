@@ -24,6 +24,7 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.orhanobut.logger.Logger
 import java.util.*
 
 //TODO: 하나의 클래스에 모든 로직이 모여있어 수정하기 쉽지 않음. MVVM으로 리팩토링. 테스트 코드 추가 필요
@@ -92,23 +93,28 @@ class LoginActivity : AppCompatActivity() {
             .logInWithReadPermissions(this, Arrays.asList("email", "public_profile"))
         LoginManager.getInstance().registerCallback(facebookCallbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(result: LoginResult?) {
-                handleFacebookAccessToken(result?.accessToken)
+                if (result == null) {
+                    Logger.d("facebookLogin token : " + result)
+                    return
+                }
+
+                handleFacebookAccessToken(result.accessToken)
             }
 
             override fun onCancel() {
-                println("취소되었습니다.")
+                Toast.makeText(this@LoginActivity, "취소되었습니다", Toast.LENGTH_LONG).show()
             }
 
             override fun onError(error: FacebookException?) {
-                println("에러가 발생했습니다.")
+                Toast.makeText(this@LoginActivity, "에러가 발생했습니다", Toast.LENGTH_LONG).show()
             }
 
         })
     }
 
-    fun handleFacebookAccessToken(token: AccessToken?) {
-        var credential = FacebookAuthProvider.getCredential(token?.token!!)
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
+    fun handleFacebookAccessToken(token: AccessToken) {
+        firebaseAuth.signInWithCredential(
+            FacebookAuthProvider.getCredential(token.token)).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 navigateMainActivity(firebaseAuth.currentUser)
             } else if (task.exception?.message.isNullOrEmpty()) {
@@ -123,9 +129,6 @@ class LoginActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         facebookCallbackManager?.onActivityResult(requestCode, resultCode, data)
 
-        /*
-         * 구글 로그인
-         */
         if (requestCode == GOOGLE_LOGIN_CODE) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
