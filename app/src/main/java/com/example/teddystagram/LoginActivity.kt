@@ -27,7 +27,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import java.util.*
 
 //TODO: 하나의 클래스에 모든 로직이 모여있어 수정하기 쉽지 않음. MVVM으로 리팩토링. 테스트 코드 추가 필요
-//TODO: RequestToken을 캡슐화 할 필요가 있음
 class LoginActivity : AppCompatActivity() {
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val facebookCallbackManager = CallbackManager.Factory.create()
