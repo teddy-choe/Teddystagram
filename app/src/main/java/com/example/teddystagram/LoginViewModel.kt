@@ -19,6 +19,10 @@ class LoginViewModel: ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()// declare FirebaseAuth instance
 
+    companion object {
+        private const val TAG = "LoginViewModel"
+    }
+
     fun createAndLoginEmail(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
             _showToastMessage.value = R.string.empty_email_password
@@ -48,9 +52,5 @@ class LoginViewModel: ViewModel() {
                 _showToastMessage.value = R.string.error_login
             }
         }
-    }
-
-    companion object {
-        private const val TAG = "LoginViewModel"
     }
 }
