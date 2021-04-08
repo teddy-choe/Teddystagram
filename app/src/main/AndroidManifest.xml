@@ -16,7 +16,7 @@
         <activity android:name=".navigation.AddPhotoActivity" />
         <activity android:name=".SplashActivity">
         </activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

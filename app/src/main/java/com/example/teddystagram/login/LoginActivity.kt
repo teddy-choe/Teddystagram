@@ -1,4 +1,4 @@
-package com.example.teddystagram
+package com.example.teddystagram.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.teddystagram.MainActivity
+import com.example.teddystagram.R
 import com.example.teddystagram.databinding.ActivityLoginBinding
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
@@ -64,22 +66,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setGoogleSigninClient() {
-        /*
-         * 서버의 클라이언트 ID를 requestIdToken에 전달
-         */
         googleSignInClient = GoogleSignIn.getClient(
             this,
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(resources.getString(R.string.request_token))
                 .requestEmail()
                 .build())
-    }
-
-    private fun navigateMainActivity(user: FirebaseUser?) {
-        if (user != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }
     }
 
     fun googleLogin(view: View) {
@@ -112,7 +104,7 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    fun handleFacebookAccessToken(token: AccessToken) {
+    private fun handleFacebookAccessToken(token: AccessToken) {
         firebaseAuth.signInWithCredential(
             FacebookAuthProvider.getCredential(token.token)).addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -132,8 +124,8 @@ class LoginActivity : AppCompatActivity() {
         if (requestCode == GOOGLE_LOGIN_CODE) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
-                val account = task.getResult(ApiException::class.java)
-                firebaseAuthWithGoogle(account!!)
+                val account = task.getResult(ApiException::class.java) ?: return
+                firebaseAuthWithGoogle(account)
             } catch (e: ApiException) {
                 e.toString()
             }
@@ -145,8 +137,8 @@ class LoginActivity : AppCompatActivity() {
      * Firebase 사용자 인증 정보로 교환하고
      * 해당 정보를 사용해 Firebase 인증을 받는다.
      */
-    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
-        val credential = GoogleAuthProvider.getCredential(account?.idToken, null) // 사용자 인증 정보
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null) // 사용자 인증 정보
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -158,4 +150,12 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
     }
+
+    private fun navigateMainActivity(user: FirebaseUser?) {
+        if (user != null) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+    }
+
 }

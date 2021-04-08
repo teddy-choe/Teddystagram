@@ -20,8 +20,9 @@ import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
-
-    var PICK_PROFILE_FROM_ALBUM = 10
+    companion object {
+        private const val PICK_PROFILE_FROM_ALBUM = 10
+    }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         setToolbarDefault()

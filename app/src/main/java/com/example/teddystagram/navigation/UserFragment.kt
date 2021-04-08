@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.FcmPush
-import com.example.teddystagram.LoginActivity
+import com.example.teddystagram.login.LoginActivity
 import com.example.teddystagram.MainActivity
 import com.example.teddystagram.R
 import com.example.teddystagram.navigation.model.AlarmDTO
