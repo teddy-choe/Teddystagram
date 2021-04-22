@@ -30,6 +30,7 @@ import com.orhanobut.logger.Logger
 import java.util.*
 
 //TODO: 하나의 클래스에 모든 로직이 모여있어 수정하기 쉽지 않음. MVVM으로 리팩토링. 테스트 코드 추가 필요
+//TODO: 로그인 로직이 분산되있어 유지,보수하기 어려움. 로직을 좀 더 한곳에 모을 수 있도록 수정이 필요함
 class LoginActivity : AppCompatActivity() {
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val facebookCallbackManager = CallbackManager.Factory.create()
