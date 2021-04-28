@@ -17,7 +17,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -26,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         private const val PICK_PROFILE_FROM_ALBUM = 10
     }
 
-    private fun setToolbarDefault(){
+    private fun setToolbarDefault() {
         binding.toolbarUsername.visibility = View.GONE
         binding.toolbarBtnBack.visibility = View.GONE
         binding.toolbarTitleImage.visibility = View.VISIBLE
@@ -46,25 +45,25 @@ class MainActivity : AppCompatActivity() {
 
         //TODO: 클릭할때마다 새로운 프래그먼트 생성
         binding.bottomNavigation.selectedItemId = R.id.action_home
-        binding.bottomNavigation.setOnNavigationItemSelectedListener {item ->
+        binding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
             setToolbarDefault()
 
-            when(item.itemId){
+            when (item.itemId) {
                 R.id.action_home -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content,DetailViewFragment()).commit()
+                        .replace(R.id.main_content, HomeFragment()).commit()
                     return@setOnNavigationItemSelectedListener true
                 }
 
                 R.id.action_search -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content,GridFragment()).commit()
+                        .replace(R.id.main_content, SearchFragment()).commit()
                     return@setOnNavigationItemSelectedListener true
                 }
 
                 R.id.action_add_photo -> {
-                    if(ContextCompat.checkSelfPermission
-                        (this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                    if (ContextCompat.checkSelfPermission
+                        (this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         startActivity(Intent(this, AddPhotoActivity::class.java))
                     }
                     return@setOnNavigationItemSelectedListener true
@@ -72,18 +71,18 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.action_favorite_alarm -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content,AlertFragment()).commit()
+                        .replace(R.id.main_content, NotificationFragment()).commit()
                     return@setOnNavigationItemSelectedListener true
                 }
 
                 R.id.action_account -> {
-                    var userFragment = UserFragment()
+                    var userFragment = AccountFragment()
                     var bundle = Bundle()
                     var uid = FirebaseAuth.getInstance().currentUser?.uid
                     bundle.putString("destinationUid", uid)
                     userFragment.arguments = bundle
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content,userFragment).commit()
+                        .replace(R.id.main_content, userFragment).commit()
                     return@setOnNavigationItemSelectedListener true
                 }
             }
@@ -91,10 +90,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun registerPushToken(){
-        var pushToken = FirebaseInstanceId.getInstance().token
-        var uid = FirebaseAuth.getInstance().currentUser?.uid
-        var map = mutableMapOf<String,Any>()
+    fun registerPushToken() {
+        val pushToken = FirebaseInstanceId.getInstance().token
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        val map = mutableMapOf<String, Any>()
 
         map["pushToken"] = pushToken!!
         FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
@@ -106,14 +105,14 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK){
-            var imageUri = data?.data
-            var uid = FirebaseAuth.getInstance().currentUser?.uid
-            var storageRef = FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
+        if (requestCode == PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK) {
+            val imageUri = data?.data
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            val storageRef = FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
             storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
                 return@continueWithTask storageRef.downloadUrl
             }.addOnSuccessListener { uri ->
-                var map = HashMap<String, Any>()
+                val map = HashMap<String, Any>()
                 map["image"] = uri.toString()
                 FirebaseFirestore.getInstance().collection("profileImages").document(uid).set(map)
             }

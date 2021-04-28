@@ -16,23 +16,22 @@ import com.example.teddystagram.navigation.model.AlarmDTO
 import com.example.teddystagram.navigation.model.ContentDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.fragment_detail.view.*
-import kotlinx.android.synthetic.main.fragment_user.view.*
+import kotlinx.android.synthetic.main.fragment_home.view.*
 import kotlinx.android.synthetic.main.item_detail.view.*
 
-class DetailViewFragment : Fragment() {
+class HomeFragment : Fragment() {
     var firestore : FirebaseFirestore? = null
     var uid : String? = null
     var fcmPush : FcmPush? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail,container,false)
+        val view = LayoutInflater.from(activity).inflate(R.layout.fragment_home,container,false)
         firestore = FirebaseFirestore.getInstance()
         uid = FirebaseAuth.getInstance().currentUser?.uid
         //fcmPush = FcmPush()
 
-        view.detailviewfragment_recyclerview.adapter = DetailViewRecyclerViewAdapter()
-        view.detailviewfragment_recyclerview.layoutManager = LinearLayoutManager(activity)
+        view.rv_home.adapter = DetailViewRecyclerViewAdapter()
+        view.rv_home.layoutManager = LinearLayoutManager(activity)
 
         return view
     }
@@ -106,7 +105,7 @@ class DetailViewFragment : Fragment() {
 
             //This code is when the profile image is clicked
             viewholder.detailviewitem_profile_image.setOnClickListener {
-                var fragment = UserFragment()
+                var fragment = AccountFragment()
                 var bundle = Bundle()
                 bundle.putString("destinationUid", contentDTOs[p1].uid)
                 bundle.putString("userId", contentDTOs[p1].userId)

@@ -14,25 +14,27 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.R
 import com.example.teddystagram.navigation.model.ContentDTO
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.fragment_grid.view.*
+import kotlinx.android.synthetic.main.fragment_search.view.*
 
-class GridFragment :Fragment(){
+class SearchFragment : Fragment() {
 
-    var mainView : View? = null
+    var mainView: View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mainView = inflater.inflate(R.layout.fragment_grid,container,false)
-        mainView?.gridfragment_recyclerview?.adapter = GridFragmentRecyclerviewAdapter()
-        mainView?.gridfragment_recyclerview?.layoutManager = GridLayoutManager(activity,3)
-        return mainView
+        val view = LayoutInflater.from(activity).inflate(R.layout.fragment_search,container,false)
+        view.rv_search.adapter = GridFragmentRecyclerviewAdapter()
+        view.rv_search.layoutManager = GridLayoutManager(activity, 3)
+        return view
     }
-    inner class GridFragmentRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
-        var contentDTOs : ArrayList<ContentDTO>
+
+    inner class GridFragmentRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        var contentDTOs: ArrayList<ContentDTO>
+
         init {
             contentDTOs = ArrayList()
             FirebaseFirestore.getInstance().collection("images").orderBy("timestamp").addSnapshotListener { querySnapshot, firebaseFirestoreException ->
 
-                for(snapshot in querySnapshot!!.documents){
+                for (snapshot in querySnapshot!!.documents) {
                     contentDTOs.add(snapshot.toObject(ContentDTO::class.java)!!)
                 }
                 notifyDataSetChanged()
@@ -43,7 +45,7 @@ class GridFragment :Fragment(){
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             var width = resources.displayMetrics.widthPixels / 3
             var imageView = ImageView(parent.context)
-            imageView.layoutParams = LinearLayoutCompat.LayoutParams(width,width)
+            imageView.layoutParams = LinearLayoutCompat.LayoutParams(width, width)
 
             return CustomViewHolder(imageView)
         }
@@ -58,14 +60,14 @@ class GridFragment :Fragment(){
             var imageView = (holder as CustomViewHolder).imageView
             Glide.with(holder.itemView.context).load(contentDTOs[position].imageUrl).apply(RequestOptions().centerCrop()).into(imageView)
             imageView.setOnClickListener {
-                val fragment = UserFragment()
+                val fragment = AccountFragment()
                 val bundle = Bundle()
-                bundle.putString("destinationUid",contentDTOs[position].uid)
-                bundle.putString("userId",contentDTOs[position].userId)
+                bundle.putString("destinationUid", contentDTOs[position].uid)
+                bundle.putString("userId", contentDTOs[position].userId)
 
                 fragment.arguments = bundle
 
-                activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_content,fragment)?.commit()
+                activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_content, fragment)?.commit()
 
             }
         }

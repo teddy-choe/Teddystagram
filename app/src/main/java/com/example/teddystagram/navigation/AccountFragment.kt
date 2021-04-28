@@ -26,7 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_user.view.*
 
-class UserFragment : Fragment() {
+class AccountFragment : Fragment() {
     var fragmentView: View? = null
     var firestore: FirebaseFirestore? = null
     var uid: String? = null
@@ -39,7 +39,7 @@ class UserFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        fragmentView = LayoutInflater.from(activity).inflate(R.layout.fragment_user, container, false)
+        fragmentView = LayoutInflater.from(activity).inflate(R.layout.fragment_account, container, false)
         uid = arguments?.getString("destinationUid")
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
