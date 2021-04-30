@@ -23,8 +23,8 @@ import com.example.teddystagram.navigation.model.ContentDTO
 import com.example.teddystagram.navigation.model.FollowDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.fragment_account.view.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_user.view.*
 
 class AccountFragment : Fragment() {
     var fragmentView: View? = null
@@ -66,7 +66,7 @@ class AccountFragment : Fragment() {
             mainActivity.toolbar_title_image.visibility = View.GONE
             mainActivity.toolbar_btn_back.visibility = View.VISIBLE
             mainActivity.toolbar_username.visibility = View.VISIBLE
-            mainActivity.toolbar_username.text = arguments!!.getString("userId")
+            mainActivity.toolbar_username.text = requireArguments().getString("userId")
             mainActivity.toolbar_btn_back.setOnClickListener {
                 mainActivity.bottom_navigation.selectedItemId = R.id.action_home
             }
@@ -76,7 +76,7 @@ class AccountFragment : Fragment() {
         }
 
         fragmentView?.account_recyclerview?.adapter = UserFragmentRecyclerViewAdapter()
-        fragmentView?.account_recyclerview?.layoutManager = GridLayoutManager(activity!!, 3)
+        fragmentView?.account_recyclerview?.layoutManager = GridLayoutManager(activity, 3)
 
         getProfileImages()
         getFollowerAndFollowing()
@@ -96,16 +96,16 @@ class AccountFragment : Fragment() {
             var followDTO = documentSnapshot.toObject(FollowDTO::class.java)
 
             if (followDTO?.followingCount != null) {
-                fragmentView?.account_tv_following_count?.text = followDTO?.followingCount?.toString()
+                fragmentView?.account_tv_following_count?.text = followDTO.followingCount.toString()
             }
 
             if (followDTO?.followerCount != null){
-                fragmentView?.account_tv_follower_count?.text = followDTO?.followerCount?.toString()
-                if (followDTO?.followers?.containsKey(currentUserUid)!!){
+                fragmentView?.account_tv_follower_count?.text = followDTO.followerCount.toString()
+                if (followDTO.followers.containsKey(currentUserUid)){
                     fragmentView?.account_btn_follow_signout?.text = getString(R.string.follow_cancel)
                     fragmentView?.account_btn_follow_signout
                             ?.background
-                            ?.setColorFilter(ContextCompat.getColor(activity!!, R.color.colorLightGray), PorterDuff.Mode.MULTIPLY)
+                            ?.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.colorLightGray), PorterDuff.Mode.MULTIPLY)
                 } else {
                     if (uid != currentUserUid) {
                         fragmentView?.account_btn_follow_signout?.text = getString(R.string.follow)
@@ -127,7 +127,7 @@ class AccountFragment : Fragment() {
         FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
 
         var message = auth?.currentUser?.email + getString(R.string.alarm_follow)
-        fcmPush?.sendMessage(destinationUid!!, "알림 메세지 입니다.", message)
+        fcmPush?.sendMessage(destinationUid, "알림 메세지 입니다.", message)
     }
 
     fun requestFollow() {
@@ -145,8 +145,8 @@ class AccountFragment : Fragment() {
             }
 
             if (followDTO.followings.containsKey(uid)) {
-                followDTO?.followingCount = followDTO?.followingCount - 1
-                followDTO?.followings.remove(uid)
+                followDTO.followingCount = followDTO?.followingCount - 1
+                followDTO.followings.remove(uid)
             } else {
                 followDTO.followingCount = followDTO.followingCount + 1
                 followerAlarm(uid!!)
@@ -188,8 +188,8 @@ class AccountFragment : Fragment() {
         firestore?.collection("profileImages")?.document(uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             if (documentSnapshot == null) return@addSnapshotListener
             if (documentSnapshot.data != null) {
-                var url = documentSnapshot?.data!!["image"]
-                Glide.with(activity!!).load(url).apply(RequestOptions().circleCrop()).into(fragmentView?.account_iv_profile!!)
+                var url = documentSnapshot.data!!["image"]
+                Glide.with(requireActivity()).load(url).apply(RequestOptions().circleCrop()).into(fragmentView?.account_iv_profile!!)
             }
         }
     }
