@@ -31,63 +31,67 @@ class MainActivity : AppCompatActivity() {
         binding.toolbarTitleImage.visibility = View.VISIBLE
     }
 
+    //TODO: 클릭할때마다 새로운 프래그먼트 생성
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         ActivityCompat.requestPermissions(
             this,
             arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
             1
         )
-        //registerPushToken()
 
-        //TODO: 클릭할때마다 새로운 프래그먼트 생성
-        binding.bottomNavigation.selectedItemId = R.id.action_home
-        binding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
-            setToolbarDefault()
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        setToolbarDefault()
 
-            when (item.itemId) {
-                R.id.action_home -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content, HomeFragment()).commit()
-                    return@setOnNavigationItemSelectedListener true
-                }
-
-                R.id.action_search -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content, SearchFragment()).commit()
-                    return@setOnNavigationItemSelectedListener true
-                }
-
-                R.id.action_add_photo -> {
-                    if (ContextCompat.checkSelfPermission
-                        (this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        startActivity(Intent(this, AddPhotoActivity::class.java))
+        with(binding) {
+            bottomNavigation.setOnNavigationItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.action_home -> {
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.main_content, HomeFragment()).commit()
+                        return@setOnNavigationItemSelectedListener true
                     }
-                    return@setOnNavigationItemSelectedListener true
-                }
 
-                R.id.action_favorite_alarm -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content, NotificationFragment()).commit()
-                    return@setOnNavigationItemSelectedListener true
-                }
+                    R.id.action_search -> {
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.main_content, SearchFragment()).commit()
+                        return@setOnNavigationItemSelectedListener true
+                    }
 
-                R.id.action_account -> {
-                    var userFragment = AccountFragment()
-                    var bundle = Bundle()
-                    var uid = FirebaseAuth.getInstance().currentUser?.uid
-                    bundle.putString("destinationUid", uid)
-                    userFragment.arguments = bundle
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content, userFragment).commit()
-                    return@setOnNavigationItemSelectedListener true
+                    R.id.action_add_photo -> {
+                        if (ContextCompat.checkSelfPermission
+                            (this@MainActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                            startActivity(Intent(this@MainActivity, AddPhotoActivity::class.java))
+                        }
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    R.id.action_favorite_alarm -> {
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.main_content, NotificationFragment()).commit()
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    R.id.action_account -> {
+                        val userFragment = AccountFragment()
+                        val bundle = Bundle()
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                        bundle.putString("destinationUid", uid)
+                        userFragment.arguments = bundle
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.main_content, userFragment).commit()
+                        return@setOnNavigationItemSelectedListener true
+                    }
                 }
+                return@setOnNavigationItemSelectedListener false
             }
-            return@setOnNavigationItemSelectedListener false
+
+            bottomNavigation.selectedItemId = R.id.action_home
         }
+
+        //registerPushToken()
     }
 
     fun registerPushToken() {

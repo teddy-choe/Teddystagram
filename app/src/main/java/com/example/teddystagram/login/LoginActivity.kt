@@ -133,11 +133,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    /*
-     * GoogleSignInAccount에서 ID토큰을 받아와서
-     * Firebase 사용자 인증 정보로 교환하고
-     * 해당 정보를 사용해 Firebase 인증을 받는다.
-     */
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(account.idToken, null) // 사용자 인증 정보
         firebaseAuth.signInWithCredential(credential)
