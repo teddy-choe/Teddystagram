@@ -25,12 +25,6 @@ class MainActivity : AppCompatActivity() {
         private const val PICK_PROFILE_FROM_ALBUM = 10
     }
 
-    private fun setToolbarDefault() {
-        binding.toolbarUsername.visibility = View.GONE
-        binding.toolbarBtnBack.visibility = View.GONE
-        binding.toolbarTitleImage.visibility = View.VISIBLE
-    }
-
     //TODO: 클릭할때마다 새로운 프래그먼트 생성
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +37,6 @@ class MainActivity : AppCompatActivity() {
         )
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setToolbarDefault()
 
         with(binding) {
             bottomNavigation.setOnNavigationItemSelectedListener { item ->
@@ -110,15 +103,21 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK) {
-            val imageUri = data?.data
-            val uid = FirebaseAuth.getInstance().currentUser?.uid
-            val storageRef = FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
-            storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
+            if (data == null || data.data == null) {
+                //TODO : 프로필 이미지 로드 시, 에러 처리
+            }
+
+            val uid : String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+            val storageRef = FirebaseStorage.getInstance()
+                .reference.child(getString(R.string.collection_path_user_profile_images)).child(uid)
+
+            storageRef.putFile(data!!.data!!).continueWithTask { _ ->
                 return@continueWithTask storageRef.downloadUrl
             }.addOnSuccessListener { uri ->
                 val map = HashMap<String, Any>()
                 map["image"] = uri.toString()
-                FirebaseFirestore.getInstance().collection("profileImages").document(uid).set(map)
+                FirebaseFirestore.getInstance()
+                    .collection(getString(R.string.collection_path_user_profile_images)).document(uid).set(map)
             }
         }
     }

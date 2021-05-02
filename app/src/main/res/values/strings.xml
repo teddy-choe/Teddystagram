@@ -2,8 +2,6 @@
     <string name="app_name">Teddystagram</string>
     <string name="facebook_app_id">484893688824002</string>
     <string name="fb_login_protocol_scheme">fb484893688824002</string>
-    <string name="com.twitter.sdk.android.CONSUMER_KEY"></string>
-    <string name="com.twitter.sdk.android.CONSUMER_SECRET"></string>
 
     <!-- Sign In -->
     <string name="email">Email</string>
@@ -35,6 +33,8 @@
     <string name="follow_cancel">팔로우 취소</string>
     <string name="profile">Profile</string>
     <string name="count_0">0</string>
+    <string name="path_string_user_profile_images">userProfileImages</string>
+    <string name="collection_path_user_profile_images">profileImages</string>
 
     <!-- Alarm -->
     <string name="alarm_favorite">님이 좋아요를 눌렀습니다.</string>
