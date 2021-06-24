@@ -4,19 +4,16 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.example.teddystagram.databinding.ActivityMainBinding
 import com.example.teddystagram.navigation.*
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.UploadTask
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -83,17 +80,6 @@ class MainActivity : AppCompatActivity() {
 
             bottomNavigation.selectedItemId = R.id.action_home
         }
-
-        //registerPushToken()
-    }
-
-    fun registerPushToken() {
-        val pushToken = FirebaseInstanceId.getInstance().token
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        val map = mutableMapOf<String, Any>()
-
-        map["pushToken"] = pushToken!!
-        FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
     }
 
     /*
@@ -107,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                 //TODO : 프로필 이미지 로드 시, 에러 처리
             }
 
-            val uid : String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+            val uid: String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             val storageRef = FirebaseStorage.getInstance()
                 .reference.child(getString(R.string.collection_path_user_profile_images)).child(uid)
 
