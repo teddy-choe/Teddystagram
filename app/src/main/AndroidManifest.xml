@@ -12,11 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".navigation.CommentActivity" />
-        <activity android:name=".navigation.AddPhotoActivity" />
+        <activity android:name="com.example.teddystagram.ui.navigation.CommentActivity" />
+        <activity android:name="com.example.teddystagram.ui.navigation.PostActivity" />
         <activity android:name=".SplashActivity">
         </activity>
-        <activity android:name=".login.LoginActivity">
+        <activity android:name="com.example.teddystagram.ui.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

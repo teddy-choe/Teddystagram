@@ -1,4 +1,4 @@
-package com.example.teddystagram.navigation
+package com.example.teddystagram.ui.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.R
-import com.example.teddystagram.navigation.model.ContentDTO
+import com.example.teddystagram.model.ContentDTO
+import com.example.teddystagram.ui.profile.ProfileFragment
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_search.view.*
 
@@ -60,7 +61,7 @@ class SearchFragment : Fragment() {
             var imageView = (holder as CustomViewHolder).imageView
             Glide.with(holder.itemView.context).load(contentDTOs[position].imageUrl).apply(RequestOptions().centerCrop()).into(imageView)
             imageView.setOnClickListener {
-                val fragment = AccountFragment()
+                val fragment = ProfileFragment()
                 val bundle = Bundle()
                 bundle.putString("destinationUid", contentDTOs[position].uid)
                 bundle.putString("userId", contentDTOs[position].userId)

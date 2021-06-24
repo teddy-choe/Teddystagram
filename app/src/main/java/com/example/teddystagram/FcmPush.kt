@@ -1,6 +1,6 @@
 package com.example.teddystagram
 
-import com.example.teddystagram.navigation.model.PushDTO
+import com.example.teddystagram.model.PushDTO
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import okhttp3.*

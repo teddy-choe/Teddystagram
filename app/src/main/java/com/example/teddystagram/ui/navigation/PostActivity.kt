@@ -1,4 +1,4 @@
-package com.example.teddystagram.navigation
+package com.example.teddystagram.ui.navigation
 
 import android.app.Activity
 import android.content.Intent
@@ -6,7 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.teddystagram.R
-import com.example.teddystagram.navigation.model.ContentDTO
+import com.example.teddystagram.model.ContentDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_add_photo.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AddPhotoActivity : AppCompatActivity() {
+class PostActivity : AppCompatActivity() {
     var PICK_IMAGE_FROM_ALBUM = 0
     var storage : FirebaseStorage ?= null
     var photoUri : Uri? = null

@@ -1,4 +1,4 @@
-package com.example.teddystagram.navigation
+package com.example.teddystagram.ui.profile
 
 import android.content.Intent
 import android.graphics.PorterDuff
@@ -15,18 +15,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.FcmPush
-import com.example.teddystagram.login.LoginActivity
+import com.example.teddystagram.ui.login.LoginActivity
 import com.example.teddystagram.MainActivity
 import com.example.teddystagram.R
-import com.example.teddystagram.navigation.model.AlarmDTO
-import com.example.teddystagram.navigation.model.ContentDTO
-import com.example.teddystagram.navigation.model.FollowDTO
+import com.example.teddystagram.model.AlarmDTO
+import com.example.teddystagram.model.ContentDTO
+import com.example.teddystagram.model.FollowDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_account.view.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-class AccountFragment : Fragment() {
+class ProfileFragment : Fragment() {
     var fragmentView: View? = null
     var firestore: FirebaseFirestore? = null
     var uid: String? = null

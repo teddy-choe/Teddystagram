@@ -1,4 +1,4 @@
-package com.example.teddystagram.navigation
+package com.example.teddystagram.ui.home
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,8 +12,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.FcmPush
 import com.example.teddystagram.R
-import com.example.teddystagram.navigation.model.AlarmDTO
-import com.example.teddystagram.navigation.model.ContentDTO
+import com.example.teddystagram.ui.profile.ProfileFragment
+import com.example.teddystagram.ui.navigation.CommentActivity
+import com.example.teddystagram.model.AlarmDTO
+import com.example.teddystagram.model.ContentDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_home.view.*
@@ -105,7 +107,7 @@ class HomeFragment : Fragment() {
 
             //This code is when the profile image is clicked
             viewholder.detailviewitem_profile_image.setOnClickListener {
-                var fragment = AccountFragment()
+                var fragment = ProfileFragment()
                 var bundle = Bundle()
                 bundle.putString("destinationUid", contentDTOs[p1].uid)
                 bundle.putString("userId", contentDTOs[p1].userId)

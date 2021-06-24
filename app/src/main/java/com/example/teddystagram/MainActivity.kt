@@ -9,7 +9,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.example.teddystagram.databinding.ActivityMainBinding
-import com.example.teddystagram.navigation.*
+import com.example.teddystagram.ui.home.HomeFragment
+import com.example.teddystagram.ui.navigation.*
+import com.example.teddystagram.ui.profile.ProfileFragment
+import com.example.teddystagram.ui.search.SearchFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -53,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                     R.id.action_add_photo -> {
                         if (ContextCompat.checkSelfPermission
                             (this@MainActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                            startActivity(Intent(this@MainActivity, AddPhotoActivity::class.java))
+                            startActivity(Intent(this@MainActivity, PostActivity::class.java))
                         }
                         return@setOnNavigationItemSelectedListener true
                     }
@@ -65,7 +68,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.action_account -> {
-                        val userFragment = AccountFragment()
+                        val userFragment = ProfileFragment()
                         val bundle = Bundle()
                         val uid = FirebaseAuth.getInstance().currentUser?.uid
                         bundle.putString("destinationUid", uid)
@@ -82,9 +85,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /*
-     * push profileImageUrl to Firestore.collection(profileimage)
-     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

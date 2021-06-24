@@ -1,4 +1,4 @@
-package com.example.teddystagram.navigation.model
+package com.example.teddystagram.model
 
 data class ContentDTO(var explain : String? = null,
                       var imageUrl : String? = null,

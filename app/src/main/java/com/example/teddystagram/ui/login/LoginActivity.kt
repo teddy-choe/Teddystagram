@@ -1,4 +1,4 @@
-package com.example.teddystagram.login
+package com.example.teddystagram.ui.login
 
 import android.content.Intent
 import android.os.Bundle

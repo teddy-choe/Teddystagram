@@ -1,4 +1,4 @@
-package com.example.teddystagram.login
+package com.example.teddystagram.ui.login
 
 import android.util.Log
 import androidx.lifecycle.LiveData

@@ -1,4 +1,4 @@
-package com.example.teddystagram.navigation.model
+package com.example.teddystagram.model
 
 data class AlarmDTO(
         var destinationUid : String? = null,

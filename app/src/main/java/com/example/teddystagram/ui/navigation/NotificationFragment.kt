@@ -1,4 +1,4 @@
-package com.example.teddystagram.navigation
+package com.example.teddystagram.ui.navigation
 
 import android.os.Bundle
 import android.view.LayoutInflater
