@@ -6,153 +6,67 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.example.teddystagram.FcmPush
 import com.example.teddystagram.R
-import com.example.teddystagram.ui.profile.ProfileFragment
-import com.example.teddystagram.ui.navigation.CommentActivity
-import com.example.teddystagram.model.AlarmDTO
+import com.example.teddystagram.databinding.FragmentHomeBinding
 import com.example.teddystagram.model.ContentDTO
+import com.example.teddystagram.ui.navigation.CommentActivity
+import com.example.teddystagram.ui.profile.ProfileFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_home.view.*
-import kotlinx.android.synthetic.main.item_detail.view.*
 
 class HomeFragment : Fragment() {
-    var firestore : FirebaseFirestore? = null
-    var uid : String? = null
-    var fcmPush : FcmPush? = null
+    var uid: String? = null
+    var fcmPush: FcmPush? = null
+    private lateinit var adapter: HomeAdapter
+    private lateinit var binding: FragmentHomeBinding
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = LayoutInflater.from(activity).inflate(R.layout.fragment_home,container,false)
-        firestore = FirebaseFirestore.getInstance()
+        binding = FragmentHomeBinding.inflate(
+            inflater, container, false
+        ).apply {
+            lifecycleOwner = viewLifecycleOwner
+            viewModel = viewModel
+        }
         uid = FirebaseAuth.getInstance().currentUser?.uid
         //fcmPush = FcmPush()
 
-        view.rv_home.adapter = DetailViewRecyclerViewAdapter()
-        view.rv_home.layoutManager = LinearLayoutManager(activity)
+        adapter = HomeAdapter((viewModel))
+        binding.rvHome.adapter = adapter
+        observeLiveData()
+        viewModel.getHomeData()
 
-        return view
+        return binding.root
     }
-    inner class DetailViewRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        var contentDTOs : ArrayList<ContentDTO> = arrayListOf()
-        var contentUidList : ArrayList<String> = arrayListOf()
 
-        init {
+    private fun observeLiveData() {
+        viewModel.homeContent.observe(viewLifecycleOwner, {
+            adapter.submitList(it)
+        })
 
-            firestore?.collection("images")?.orderBy("timestamp")?.addSnapshotListener{ querySnapshot, firebaseFirestoreException ->
-                contentDTOs.clear()
-                contentUidList.clear()
-                if (querySnapshot == null) return@addSnapshotListener
-
-                for (snapshot in querySnapshot!!.documents) {
-                    var item = snapshot.toObject(ContentDTO::class.java)
-                    contentDTOs.add(item!!)
-                    contentUidList.add(snapshot.id)
-                }
-                notifyDataSetChanged()
+        viewModel.navigateProfileFragment.observe(viewLifecycleOwner, {
+            val fragment = ProfileFragment().apply {
+                arguments = Bundle().apply {
+                    putString("destinationUid", it.first)
+                    putString("userId", it.second)
                 }
             }
 
-        override fun onCreateViewHolder(p0: ViewGroup, p1: Int): RecyclerView.ViewHolder {
-            var view = LayoutInflater.from(p0.context).inflate(R.layout.item_detail,p0,false)
-            return CustomViewHolder(view)
-        }
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.main_content, fragment).commit()
+        })
 
-        inner class CustomViewHolder(view : View) : RecyclerView.ViewHolder(view)
-
-        override fun getItemCount(): Int {
-            return contentDTOs.size
-        }
-
-        override fun onBindViewHolder(p0: RecyclerView.ViewHolder, p1: Int) {
-            var viewholder = (p0 as CustomViewHolder).itemView
-
-            //ProfileImage
-            firestore?.collection("profileImages")?.document(contentDTOs[p1].uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-                if (documentSnapshot == null) return@addSnapshotListener
-                if (documentSnapshot.data != null) {
-                    var url = documentSnapshot?.data!!["image"]
-                    Glide.with(p0.itemView.context).load(url).apply(RequestOptions().circleCrop()).into(viewholder.detailviewitem_profile_image)
-                }
-            }
-
-            //UserId
-            viewholder.detailviewitem_profile_textview.text = contentDTOs!![p1].userId
-
-            //Image
-            Glide.with(p0.itemView.context).load(contentDTOs!![p1].imageUrl).into(viewholder.detailviewitem_imageview_content)
-
-            //Explain of content
-            viewholder.detailviewitem_explain_textview.text = contentDTOs!![p1].explain
-
-            //likes
-            viewholder.detailviewitem_favoritecounter_textview.text = "Likes" + contentDTOs!![p1].favoriteCount
-
-            //This code is when the button is clicked
-            viewholder.detailviewitem_favorite_imageview.setOnClickListener {
-                favoriteEvent(p1)
-            }
-
-            if(contentDTOs!![p1].favorites.containsKey(uid)){
-                //This is like status
-                viewholder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite)
-            } else {
-                //This is unlike status
-                viewholder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite_border)
-            }
-
-            //This code is when the profile image is clicked
-            viewholder.detailviewitem_profile_image.setOnClickListener {
-                var fragment = ProfileFragment()
-                var bundle = Bundle()
-                bundle.putString("destinationUid", contentDTOs[p1].uid)
-                bundle.putString("userId", contentDTOs[p1].userId)
-                fragment.arguments = bundle
-                activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_content,fragment)?.commit()
-            }
-            viewholder.detailviewitem_comment_imageview.setOnClickListener { v ->
-                var intent = Intent (v.context, CommentActivity::class.java)
-                intent.putExtra("contentUid",contentUidList[p1])
-                intent.putExtra("destinationUid",contentDTOs[p1].uid)
-                startActivity(intent)
-            }
-        }
-
-        fun favoriteEvent(position : Int) {
-            var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
-            firestore?.runTransaction { transaction ->
-                var contentDTO = transaction.get(tsDoc!!).toObject(ContentDTO::class.java)
-
-                if(contentDTO!!.favorites.containsKey(uid)){
-                    //When the button is clicked
-                    contentDTO?.favoriteCount = contentDTO?.favoriteCount -1
-                    contentDTO?.favorites.remove(uid)
-                } else {
-                    //When the button is not clicked
-                    contentDTO?.favoriteCount = contentDTO?.favoriteCount +1
-                    contentDTO?.favorites[uid!!] = true
-                    favoriteAlarm(contentDTOs[position].uid!!)
-                }
-                transaction.set(tsDoc,contentDTO)
-            }
-        }
-
-        fun favoriteAlarm(destinationUid: String) {
-            var alarmDTO = AlarmDTO()
-            alarmDTO.destinationUid = destinationUid
-            alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
-            alarmDTO.uid = FirebaseAuth.getInstance().currentUser?.uid
-            alarmDTO.kind = 0
-            alarmDTO.timestamp = System.currentTimeMillis()
-
-            FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
-
-            var message = FirebaseAuth.getInstance()?.currentUser?.email + getString(R.string.alarm_favorite)
-            fcmPush?.sendMessage(destinationUid,"알림 메세지 입니다.",message)
-        }
-        }
+        viewModel.navigateCommentActivity.observe(viewLifecycleOwner, {
+            startActivity(
+                Intent(activity, CommentActivity::class.java).apply {
+                putExtra("contentUid", it.first)
+                putExtra("destinationUid", it.second)
+            })
+        })
     }
+}

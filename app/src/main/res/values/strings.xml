@@ -25,6 +25,9 @@
     <string name="favorite">Favorite</string>
     <string name="account">Account</string>
 
+    <!-- Home -->
+    <string name="like_count">Like : %d</string>
+
     <!-- Account -->
     <string name="post">게시물</string>
     <string name="following">팔로잉</string>
