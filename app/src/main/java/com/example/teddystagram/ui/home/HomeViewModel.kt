@@ -64,7 +64,7 @@ class HomeViewModel : ViewModel(), HomeEventListener {
                 _homeContents.value = homeContents
             }
             .addOnFailureListener {
-
+                it.toString()
             }
     }
 
@@ -95,7 +95,7 @@ class HomeViewModel : ViewModel(), HomeEventListener {
         }
     }
 
-    fun favoriteAlarm(destinationUid: String) {
+    private fun favoriteAlarm(destinationUid: String) {
         val alarmDTO = AlarmDTO()
         alarmDTO.destinationUid = destinationUid
         alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email

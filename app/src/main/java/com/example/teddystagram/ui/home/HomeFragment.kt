@@ -15,6 +15,9 @@ import com.example.teddystagram.databinding.FragmentHomeBinding
 import com.example.teddystagram.model.ContentDTO
 import com.example.teddystagram.ui.navigation.CommentActivity
 import com.example.teddystagram.ui.profile.ProfileFragment
+import com.example.teddystagram.util.CONTENT_UID
+import com.example.teddystagram.util.DESTINATION_UID
+import com.example.teddystagram.util.USER_ID
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_home.view.*
@@ -52,8 +55,8 @@ class HomeFragment : Fragment() {
         viewModel.navigateProfileFragment.observe(viewLifecycleOwner, {
             val fragment = ProfileFragment().apply {
                 arguments = Bundle().apply {
-                    putString("destinationUid", it.first)
-                    putString("userId", it.second)
+                    putString(DESTINATION_UID, it.first)
+                    putString(USER_ID, it.second)
                 }
             }
 
@@ -64,8 +67,8 @@ class HomeFragment : Fragment() {
         viewModel.navigateCommentActivity.observe(viewLifecycleOwner, {
             startActivity(
                 Intent(activity, CommentActivity::class.java).apply {
-                putExtra("contentUid", it.first)
-                putExtra("destinationUid", it.second)
+                putExtra(CONTENT_UID, it.first)
+                putExtra(DESTINATION_UID, it.second)
             })
         })
     }
