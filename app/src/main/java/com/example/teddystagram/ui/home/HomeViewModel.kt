@@ -1,14 +1,9 @@
 package com.example.teddystagram.ui.home
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.example.teddystagram.R
 import com.example.teddystagram.model.AlarmDTO
-import com.example.teddystagram.model.ContentDTO
 import com.example.teddystagram.model.HomeContent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -52,15 +47,15 @@ class HomeViewModel : ViewModel(), HomeEventListener {
                     firebaseDb
                         .collection(PROFILE_IMAGE)
                         .document(item.uid!!)
-                        .addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-                            if (documentSnapshot == null) return@addSnapshotListener
-                            if (documentSnapshot.data?.get(IMAGE) == null) {
-                                Log.d(TAG, "profileImage is null")
-                                return@addSnapshotListener
-                            }
-                            item.profileImageUrl = documentSnapshot.data!![IMAGE] as String
-                            }
+                        .get()
+                        .addOnSuccessListener {
+                            val url = it.data?.get(IMAGE) ?: ""
+                            item.profileImageUrl = url as String
                         }
+                        .addOnFailureListener {
+                            it.toString()
+                        }
+                }
                 _homeContents.value = homeContents
             }
             .addOnFailureListener {

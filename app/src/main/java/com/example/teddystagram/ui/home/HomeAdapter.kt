@@ -5,25 +5,20 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.teddystagram.R
 import com.example.teddystagram.databinding.ItemDetailBinding
-import com.example.teddystagram.model.ContentDTO
 import com.example.teddystagram.model.HomeContent
-import kotlinx.android.synthetic.main.item_detail.view.*
 
 class HomeAdapter(
     private val homeEventListener: HomeEventListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var homeContents: ArrayList<HomeContent> = arrayListOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): RecyclerView.ViewHolder {
-        val holder = DetailViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, p1: Int): RecyclerView.ViewHolder =
+        DetailViewHolder(
             ItemDetailBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             ),
             homeEventListener
         )
-
-        return holder
-    }
 
     override fun getItemCount(): Int {
         return homeContents.size
@@ -31,24 +26,23 @@ class HomeAdapter(
 
     fun submitList(homeContents: ArrayList<HomeContent>) {
         this.homeContents.clear()
-        this.homeContents.addAll(homeContents
-        )
+        this.homeContents.addAll(homeContents)
         notifyDataSetChanged()
     }
 
-    override fun onBindViewHolder(p0: RecyclerView.ViewHolder, p1: Int) {
-        (p0 as DetailViewHolder).bind(this.homeContents[p1])
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        (holder as DetailViewHolder).bind(this.homeContents[position])
     }
 
     class DetailViewHolder(
         private val binding: ItemDetailBinding,
         private val homeEventListener: HomeEventListener
-        ) : RecyclerView.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(homeContent: HomeContent) {
             binding.data = homeContent
             binding.eventListener = homeEventListener
 
-            if (homeContent.favorites.containsKey(homeContent.snapshotId)) {
+            if (homeContent.favorites.containsKey(homeContent.uid)) {
                 binding.ivLike.setImageResource(R.drawable.ic_favorite)
             } else {
                 binding.ivLike.setImageResource(R.drawable.ic_favorite_border)

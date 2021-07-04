@@ -87,7 +87,7 @@ class ProfileFragment : Fragment() {
     /*
      * snapshotListener를 통해서 user collection 안의 팔로우 팔로잉 데이터를 가져옵니다
      */
-    fun getFollowerAndFollowing() {
+    private fun getFollowerAndFollowing() {
         firestore?.collection("users")?.document(uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
 
             if (documentSnapshot == null)
