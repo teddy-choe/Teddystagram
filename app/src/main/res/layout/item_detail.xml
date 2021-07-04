@@ -31,14 +31,17 @@
                 android:layout_height="35dp"
                 android:layout_margin="7.5dp"
                 android:onClick="@{() -> eventListener.onClickProfileImage(data)}"
-                binds:setImage="@{data.profileImageUrl}"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@mipmap/ic_launcher"
+                binds:setImage="@{data.profileImageUrl}" />
 
             <TextView
                 android:id="@+id/tv_profile_user_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="@{data.userId}"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
                 tools:text="userId" />
         </LinearLayout>
 
