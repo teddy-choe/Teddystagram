@@ -16,8 +16,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/colorWhite"
+        android:layout_marginVertical="16dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -69,6 +70,7 @@
                 android:id="@+id/iv_comment"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
+                android:layout_marginLeft="12dp"
                 android:onClick="@{() -> eventListener.onClickCommentImage(data)}"
                 android:src="@drawable/ic_chat_black" />
         </LinearLayout>
@@ -78,7 +80,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
             android:text="@{@string/like_count(data.favoriteCount)}"
+            android:textSize="12sp"
+            android:textColor="@android:color/black"
             tools:text="like 0" />
 
         <TextView
@@ -88,6 +93,9 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:text="@{data.explain}"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp"
+            android:textColor="@android:color/black"
             tools:text="explain" />
     </LinearLayout>
 </layout>

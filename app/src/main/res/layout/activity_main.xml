@@ -6,7 +6,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
         tools:context=".MainActivity">
 
         <androidx.appcompat.widget.Toolbar
@@ -61,6 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            app:backgroundTint="@android:color/white"
             app:menu="@menu/bottom_navigation_main">
 
         </com.google.android.material.bottomnavigation.BottomNavigationView>
