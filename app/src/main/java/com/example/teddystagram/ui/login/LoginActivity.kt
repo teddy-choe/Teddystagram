@@ -30,17 +30,10 @@ import com.orhanobut.logger.Logger
 import java.util.*
 
 //TODO: 하나의 클래스에 모든 로직이 모여있어 수정하기 쉽지 않음. MVVM으로 리팩토링. 테스트 코드 추가 필요
-//TODO: 로그인 로직이 분산되있어 유지,보수하기 어려움. 로직을 좀 더 한곳에 모을 수 있도록 수정이 필요함
 class LoginActivity : AppCompatActivity() {
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val facebookCallbackManager = CallbackManager.Factory.create()
-    private var googleSignInClient: GoogleSignInClient? = null
     private lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
-
-    companion object {
-        private const val GOOGLE_LOGIN_CODE = 9001
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +41,6 @@ class LoginActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         binding.viewModel = viewModel
 
-        setGoogleSigninClient()
         observeViewModel()
     }
 
@@ -64,87 +56,6 @@ class LoginActivity : AppCompatActivity() {
         viewModel.onNavigateMainActivity.observe(this, Observer { currentUser ->
             navigateMainActivity(currentUser)
         })
-    }
-
-    private fun setGoogleSigninClient() {
-        googleSignInClient = GoogleSignIn.getClient(
-            this,
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(resources.getString(R.string.request_token))
-                .requestEmail()
-                .build())
-    }
-
-    fun googleLogin(view: View) {
-        val signInIntent = googleSignInClient?.signInIntent
-        startActivityForResult(signInIntent, GOOGLE_LOGIN_CODE)
-    }
-
-    fun facebookLogin(view: View) {
-        LoginManager
-            .getInstance()
-            .logInWithReadPermissions(this, Arrays.asList("email", "public_profile"))
-        LoginManager.getInstance().registerCallback(facebookCallbackManager, object : FacebookCallback<LoginResult> {
-            override fun onSuccess(result: LoginResult?) {
-                if (result == null) {
-                    Logger.d("facebookLogin token : " + result)
-                    return
-                }
-
-                handleFacebookAccessToken(result.accessToken)
-            }
-
-            override fun onCancel() {
-                Toast.makeText(this@LoginActivity, "취소되었습니다", Toast.LENGTH_LONG).show()
-            }
-
-            override fun onError(error: FacebookException?) {
-                Toast.makeText(this@LoginActivity, "에러가 발생했습니다", Toast.LENGTH_LONG).show()
-            }
-
-        })
-    }
-
-    private fun handleFacebookAccessToken(token: AccessToken) {
-        firebaseAuth.signInWithCredential(
-            FacebookAuthProvider.getCredential(token.token)).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                navigateMainActivity(firebaseAuth.currentUser)
-            } else if (task.exception?.message.isNullOrEmpty()) {
-                Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        facebookCallbackManager?.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == GOOGLE_LOGIN_CODE) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = task.getResult(ApiException::class.java) ?: return
-                firebaseAuthWithGoogle(account)
-            } catch (e: ApiException) {
-                e.toString()
-            }
-        }
-    }
-
-    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null) // 사용자 인증 정보
-        firebaseAuth.signInWithCredential(credential)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    navigateMainActivity(firebaseAuth.currentUser)
-                } else if (task.exception?.message.isNullOrEmpty()) {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-                }
-            }
     }
 
     private fun navigateMainActivity(user: FirebaseUser?) {

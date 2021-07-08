@@ -7,20 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.teddystagram.FcmPush
 import com.example.teddystagram.R
 import com.example.teddystagram.databinding.FragmentHomeBinding
-import com.example.teddystagram.model.ContentDTO
 import com.example.teddystagram.ui.navigation.CommentActivity
 import com.example.teddystagram.ui.profile.ProfileFragment
 import com.example.teddystagram.util.CONTENT_UID
 import com.example.teddystagram.util.DESTINATION_UID
 import com.example.teddystagram.util.USER_ID
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.fragment_home.view.*
 
 class HomeFragment : Fragment() {
     var uid: String? = null
@@ -29,7 +24,11 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by viewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentHomeBinding.inflate(
             inflater, container, false
         ).apply {
@@ -48,7 +47,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        viewModel.homeContent.observe(viewLifecycleOwner, {
+        viewModel.homeUiData.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 
@@ -67,9 +66,9 @@ class HomeFragment : Fragment() {
         viewModel.navigateCommentActivity.observe(viewLifecycleOwner, {
             startActivity(
                 Intent(activity, CommentActivity::class.java).apply {
-                putExtra(CONTENT_UID, it.first)
-                putExtra(DESTINATION_UID, it.second)
-            })
+                    putExtra(CONTENT_UID, it.first)
+                    putExtra(DESTINATION_UID, it.second)
+                })
         })
     }
 }

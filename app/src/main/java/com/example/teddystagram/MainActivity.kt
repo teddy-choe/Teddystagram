@@ -13,6 +13,7 @@ import com.example.teddystagram.ui.home.HomeFragment
 import com.example.teddystagram.ui.navigation.*
 import com.example.teddystagram.ui.profile.ProfileFragment
 import com.example.teddystagram.ui.search.SearchFragment
+import com.example.teddystagram.util.DESTINATION_UID
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -25,7 +26,6 @@ class MainActivity : AppCompatActivity() {
         private const val PICK_PROFILE_FROM_ALBUM = 10
     }
 
-    //TODO: 클릭할때마다 새로운 프래그먼트 생성
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                         val userFragment = ProfileFragment()
                         val bundle = Bundle()
                         val uid = FirebaseAuth.getInstance().currentUser?.uid
-                        bundle.putString("destinationUid", uid)
+                        bundle.putString(DESTINATION_UID, uid)
                         userFragment.arguments = bundle
                         supportFragmentManager.beginTransaction()
                             .replace(R.id.main_content, userFragment).commit()

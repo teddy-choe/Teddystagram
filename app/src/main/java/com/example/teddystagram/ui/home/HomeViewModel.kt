@@ -4,7 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.teddystagram.model.AlarmDTO
-import com.example.teddystagram.model.HomeContent
+import com.example.teddystagram.model.ContentDTO
+import com.example.teddystagram.model.HomeUiData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -22,8 +23,8 @@ class HomeViewModel : ViewModel(), HomeEventListener {
 
     private val firebaseDb = Firebase.firestore
 
-    private val _homeContents: MutableLiveData<ArrayList<HomeContent>> = MutableLiveData()
-    val homeContent: LiveData<ArrayList<HomeContent>> = _homeContents
+    private val _homeUiData: MutableLiveData<ArrayList<HomeUiData>> = MutableLiveData()
+    val homeUiData: LiveData<ArrayList<HomeUiData>> = _homeUiData
 
     private val _navigateProfileFragment: MutableLiveData<Pair<String, String>> = MutableLiveData()
     val navigateProfileFragment: LiveData<Pair<String, String>> = _navigateProfileFragment
@@ -35,56 +36,55 @@ class HomeViewModel : ViewModel(), HomeEventListener {
         firebaseDb.collection(IMAGE)
             .get()
             .addOnSuccessListener { result ->
-                val homeContents: ArrayList<HomeContent> = ArrayList()
+                val homeUiDataList: ArrayList<HomeUiData> = ArrayList()
 
                 for (snapshot in result) {
-                    Logger.d(snapshot)
-                    val item = snapshot.toObject(HomeContent::class.java)
-                    item.snapshotId = snapshot.id
-                    homeContents.add(item)
+                    val contentDTO = snapshot.toObject(ContentDTO::class.java)
+                    val homeUiData = HomeUiData(snapshotId = snapshot.id, contentDTO = contentDTO)
 
-                    //TODO: RxJava로 연쇄적인 API호출을 깔끔하게 처리할 수 없는지
                     firebaseDb
                         .collection(PROFILE_IMAGE)
-                        .document(item.uid!!)
+                        .document(contentDTO.uid!!)
                         .get()
                         .addOnSuccessListener {
                             val url = it.data?.get(IMAGE) ?: ""
-                            item.profileImageUrl = url as String
+                            homeUiData.profileImageUrl = url as String
                         }
                         .addOnFailureListener {
                             it.toString()
                         }
+
+                    homeUiDataList.add(homeUiData)
                 }
-                _homeContents.value = homeContents
+                _homeUiData.value = homeUiDataList
             }
             .addOnFailureListener {
                 it.toString()
             }
     }
 
-    override fun onClickProfileImage(homeContent: HomeContent) {
-        _navigateProfileFragment.value = Pair(homeContent.uid!!, homeContent.userId!!)
+    override fun onClickProfileImage(homeUiData: HomeUiData) {
+        _navigateProfileFragment.value = Pair(homeUiData.contentDTO.uid!!, homeUiData.contentDTO.userId!!)
     }
 
-    override fun onClickCommentImage(homeContent: HomeContent) {
-        _navigateCommentActivity.value = Pair(homeContent.snapshotId!!, homeContent.uid!!)
+    override fun onClickCommentImage(homeUiData: HomeUiData) {
+        _navigateCommentActivity.value = Pair(homeUiData.snapshotId!!, homeUiData.contentDTO.uid!!)
     }
 
-    override fun onClickLikeImage(homeContent: HomeContent) {
-        val tsDoc = firebaseDb.collection(IMAGE).document(homeContent.snapshotId!!)
+    override fun onClickLikeImage(homeUiData: HomeUiData) {
+        val tsDoc = firebaseDb.collection(IMAGE).document(homeUiData.snapshotId!!)
         firebaseDb.runTransaction { transaction ->
-            val dto = transaction.get(tsDoc).toObject(HomeContent::class.java)
+            val dto = transaction.get(tsDoc).toObject(HomeUiData::class.java)
 
-            if (dto!!.favorites.containsKey(homeContent.uid)) {
+            if (dto!!.contentDTO.favorites.containsKey(homeUiData.contentDTO.uid)) {
                 //When the button is clicked
-                dto.favoriteCount = dto.favoriteCount?.minus(1)
-                dto.favorites.remove(homeContent.uid)
+                dto.contentDTO.favoriteCount = dto.contentDTO.favoriteCount?.minus(1)
+                dto.contentDTO.favorites.remove(homeUiData.contentDTO.uid)
             } else {
                 //When the button is not clicked
-                dto.favoriteCount = dto.favoriteCount?.plus(1)
-                dto.favorites[homeContent.uid!!] = true
-                favoriteAlarm(dto.uid!!)
+                dto.contentDTO.favoriteCount = dto.contentDTO.favoriteCount?.plus(1)
+                dto.contentDTO.favorites[homeUiData.contentDTO.uid!!] = true
+                favoriteAlarm(dto.contentDTO.uid!!)
             }
             transaction.set(tsDoc, dto)
         }
@@ -107,9 +107,9 @@ class HomeViewModel : ViewModel(), HomeEventListener {
 }
 
 interface HomeEventListener {
-    fun onClickProfileImage(homeContent: HomeContent)
+    fun onClickProfileImage(homeUiData: HomeUiData)
 
-    fun onClickCommentImage(homeContent: HomeContent)
+    fun onClickCommentImage(homeUiData: HomeUiData)
 
-    fun onClickLikeImage(homeContent: HomeContent)
+    fun onClickLikeImage(homeUiData: HomeUiData)
 }

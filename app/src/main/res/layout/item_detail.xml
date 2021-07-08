@@ -4,10 +4,9 @@
     xmlns:binds="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="data"
-            type="com.example.teddystagram.model.HomeContent" />
+            type="com.example.teddystagram.model.HomeUiData" />
 
         <variable
             name="eventListener"
@@ -40,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@{data.userId}"
+                android:text="@{data.contentDTO.userId}"
                 android:textColor="@android:color/black"
                 android:textSize="12sp"
                 tools:text="userId" />
@@ -51,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:scaleType="fitCenter"
-            binds:setImage="@{data.imageUrl}" />
+            binds:setImage="@{data.contentDTO.imageUrl}" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -81,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:text="@{@string/like_count(data.favoriteCount)}"
+            android:text="@{@string/like_count(data.contentDTO.favoriteCount)}"
             android:textSize="12sp"
             android:textColor="@android:color/black"
             tools:text="like 0" />
@@ -92,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:text="@{data.explain}"
+            android:text="@{data.contentDTO.explain}"
             android:textSize="12sp"
             android:layout_marginTop="8dp"
             android:textColor="@android:color/black"
