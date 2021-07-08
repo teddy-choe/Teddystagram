@@ -53,15 +53,13 @@ class LoginActivity : AppCompatActivity() {
             Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         })
 
-        viewModel.onNavigateMainActivity.observe(this, Observer { currentUser ->
-            navigateMainActivity(currentUser)
+        viewModel.onNavigateMainActivity.observe(this, Observer {
+            navigateMainActivity()
         })
     }
 
-    private fun navigateMainActivity(user: FirebaseUser?) {
-        if (user != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }
+    private fun navigateMainActivity() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }

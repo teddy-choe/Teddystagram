@@ -15,8 +15,8 @@ class LoginViewModel: ViewModel() {
     private val _showErrorMessage : MutableLiveData<String> = MutableLiveData()
     val showErrorMessage : LiveData<String> = _showErrorMessage
 
-    private val _onNavigateMainActivity : MutableLiveData<FirebaseUser> = MutableLiveData()
-    val onNavigateMainActivity : LiveData<FirebaseUser> = _onNavigateMainActivity
+    private val _onNavigateMainActivity : MutableLiveData<Unit> = MutableLiveData()
+    val onNavigateMainActivity : LiveData<Unit> = _onNavigateMainActivity
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()// declare FirebaseAuth instance
 
@@ -45,7 +45,7 @@ class LoginViewModel: ViewModel() {
     private fun loginEmail(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                _onNavigateMainActivity.value = auth.currentUser
+                _onNavigateMainActivity.value = Unit
             } else if (task.exception?.message.isNullOrEmpty()) {
                 Log.e(TAG, task.exception.toString())
                 _showErrorMessage.value = task.exception.toString()
