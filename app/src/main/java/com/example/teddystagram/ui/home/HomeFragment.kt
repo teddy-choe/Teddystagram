@@ -1,6 +1,7 @@
 package com.example.teddystagram.ui.home
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +41,7 @@ class HomeFragment : Fragment() {
 
         adapter = HomeAdapter((viewModel))
         binding.rvHome.adapter = adapter
+        binding.rvHome.addItemDecoration(HomeItemDecorator(1f, 12f, Color.GRAY))
         observeLiveData()
         viewModel.getHomeData()
 

@@ -6,7 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.teddystagram.R
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
 class LoginViewModel: ViewModel() {
     private val _showToastMessage : MutableLiveData<Int> = MutableLiveData()
@@ -18,7 +19,7 @@ class LoginViewModel: ViewModel() {
     private val _onNavigateMainActivity : MutableLiveData<Unit> = MutableLiveData()
     val onNavigateMainActivity : LiveData<Unit> = _onNavigateMainActivity
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()// declare FirebaseAuth instance
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     companion object {
         private const val TAG = "LoginViewModel"
@@ -46,11 +47,15 @@ class LoginViewModel: ViewModel() {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 _onNavigateMainActivity.value = Unit
-            } else if (task.exception?.message.isNullOrEmpty()) {
-                Log.e(TAG, task.exception.toString())
-                _showErrorMessage.value = task.exception.toString()
             } else {
-                _showToastMessage.value = R.string.error_login
+                when (task.exception) {
+                    is FirebaseAuthInvalidUserException ->
+                        _showErrorMessage.value = "email does not exist or has been disabled"
+                    is FirebaseAuthInvalidCredentialsException ->
+                        _showErrorMessage.value = "password is wrong"
+                    else ->
+                        _showErrorMessage.value = "unknown error"
+                }
             }
         }
     }
